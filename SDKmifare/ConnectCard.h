@@ -36,7 +36,7 @@ public:
 		return (SCARD_IO_REQUEST *)SCARD_PCI_T1;
 	}
 
-	CONSTANTS* constants;    //定数クラスをインスタンス化
+	CONSTANTSSTRING::CONSTANTS* constants = new CONSTANTSSTRING::CONSTANTS();    //定数クラスをインスタンス化
 
 	/*概要：機器との通信を行うためのリソースマネージャを確保するための関数
 	引数：なし
@@ -45,7 +45,7 @@ public:
 	作成者：K.Asada*/
 	unsigned long EstablishContext() {
 		SCARDCONTEXT hContext = 0;        //確保したリソースマネージャのアドレス
-		unsigned long lResult;                     //リソースマネージャを確保した際の結果を格納するための変数
+		unsigned int lResult;                     //リソースマネージャを確保した際の結果を格納するための変数
 		//リソースマネージャを確保し、その結果を取得する
 		lResult = ::SCardEstablishContext(SCARD_SCOPE_USER, NULL, NULL, &hContext);
 		//もし確保に失敗していたら例外を投げる
@@ -71,11 +71,12 @@ public:
 	作成日：2017.10.10
 	作成者：K.Asada*/
 	void CheckReaderName(unsigned long Context) {
-		char* ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
+//		std::cout >> constants->PASORI_NAME.c_str();
+		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
 		unsigned long dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
 		unsigned long lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
 		//確保したリソースマネージャのリーダの名前調べる
-		lResult = ::SCardListReaders(Context, NULL, (WCHAR*)&ReaderName, &dwAutoAllocate);
+		lResult = ::SCardListReaders(Context, NULL, (LPTSTR)&ReaderName, &dwAutoAllocate);
 		//失敗したら例外を投げる
 		if (lResult != SCARD_S_SUCCESS) {
 			//目的のリーダーと違っていたらその旨を例外として投げる
@@ -89,11 +90,11 @@ public:
 			}
 		}
 		//目的のリーダーの名前と違っていたらその旨を例外として伝える
-		if (ReaderName != constants->PASORI_NAME) {
+/*		if (ReaderName != (LPTSTR)constants->PASORI_NAME) {
 			//リーダーが違う旨を例外として投げる
-	//		throw gcnew System::Exception(NO_READERS_ERROR);
+		//	throw gcnew System::Exception(NO_READERS_ERROR);
 			EndConnect(Context);
-		}
+		}*/
 		//カード、リーダーとの接続を終了する
 		return;
 	}
@@ -104,7 +105,7 @@ public:
 		：SENDCOMM SendComm：カードへ送信するコマンド
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	unsigned char** Transmit(unsigned long hContext, unsigned long hCard, CONSTANTS::SENDCOMM SendComm[],unsigned long ActiveProtocol) {
+	unsigned char** Transmit(unsigned long hContext, unsigned long hCard, CONSTANTSSTRING::CONSTANTS::SENDCOMM SendComm[],unsigned long ActiveProtocol) {
 		unsigned char RecvBuf[PCSC_RECV_BUFF_LEN] = { '\0' };
 		unsigned char* RetBuf[16] = { '\0' };
 		unsigned long ResponseSize = 0;
@@ -128,6 +129,7 @@ public:
 				RetBuf[i][j] = RecvBuf[j];
 			}
 		}
+		System::Windows::Forms::MessageBox::Show("aaa");
 		//作成した文字列を返却する
 		return RetBuf;
 	}
@@ -169,6 +171,7 @@ public:
 			//接続を終了する
 			EndConnect(hContext, *hCard);
 		}
+		System::Windows::Forms::MessageBox::Show("aaa");
 		return ActiveProtocol;
 	}
 

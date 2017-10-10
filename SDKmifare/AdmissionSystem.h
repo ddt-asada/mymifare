@@ -10,7 +10,7 @@ public:
 
 	}
 
-	CONSTANTS* constants;    //定数クラスをインスタンス化
+	CONSTANTSSTRING::CONSTANTS* constants = new CONSTANTSSTRING::CONSTANTS();    //定数クラスをインスタンス化
 
 	/*概要:対象のユーザーのデータが存在しているかを確認するための関数
 	引数:unsigned data:カードより取得した全データ
@@ -148,25 +148,28 @@ public:
 	戻り値:string uid:カードより取得したユーザーID
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	std::string GetCardData(unsigned char hContext, unsigned char hCard,std::string pass, unsigned long ActiveProtocol) {
+	std::string GetCardData(unsigned char hContext, unsigned char hCard, std::string pass, unsigned long ActiveProtocol) {
 		ConnectCard* con;
 		unsigned char** getdata = { '\0' };    //取得したカードデータを格納するための変数
 		//送信コマンドを格納するための変数、初期値としてキー認証及びセクタ認証を格納
-		CONSTANTS::SENDCOMM SendComm[21] = {constants->LOADKEY, constants->AUTHENTICATE};
+		CONSTANTSSTRING::CONSTANTS::SENDCOMM SendComm[21] = { CONSTANTSSTRING::LOADKEY, CONSTANTSSTRING::AUTHENTICATE };
+		CONSTANTSSTRING::CONSTANTS::SENDCOMM copyauthenticate = CONSTANTSSTRING::AUTHENTICATE;
+		CONSTANTSSTRING::CONSTANTS::SENDCOMM copyreadcard = CONSTANTSSTRING::READCARD;
 		//送信コマンドを組み立てるためのfor文
 		for (int i = 0; i < constants->BLOCK_COUNT; i++) {
 			//対象のブロックが4の倍数-1の時はセクタの終端ブロックであり、キー名等の管理用の情報が格納されているため読み飛ばす
 			if (i % 4 == 3) {
 				//次のセクタへの認証を行う（4ブロックごとにセクタが切り替わるため）
-				SendComm[2 + i] = { constants->AUTHENTICATE.sendLength, constants->AUTHENTICATE.sendCommand[7] += (i + 1) };
+				SendComm[2 + i] = { copyauthenticate.sendLength, copyauthenticate.sendCommand[7] += (i + 1) };
 			}//それ以外の時は通常通り対象のブロックからデータを取得する
 			else {
 				//データを受信するためのコマンドを格納する
-				SendComm[2 + i] = { constants->READCARD.sendLength, constants->READCARD.sendCommand[3] = i+ constants->BLOCK_COUNT };
+				SendComm[2 + i] = { copyreadcard.sendLength, copyreadcard.sendCommand[3] = i+ constants->BLOCK_COUNT };
 			}
 		}
 		//作成した送信コマンドの終わりに送信コマンドの終わりを示すコマンドを格納する
 		SendComm[2 + constants->BLOCK_COUNT] = { -1,NULL };
+		System::Windows::Forms::MessageBox::Show("aaa");
 		//データを受信するコマンドを送信してデータを取得する
 		getdata = con->Transmit(hContext, hCard, SendComm, ActiveProtocol);
 		//取得したデータのユーザ情報を照合し、ユーザIDを取得する
