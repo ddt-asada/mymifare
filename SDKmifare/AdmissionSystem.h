@@ -1,42 +1,16 @@
 #pragma once
 
 #include <iostream>
+#include "ConnectCard.h"
+#include "CONSTANTS.h"
 
 public class AdmissionSystem {
+public:
 	AdmissionSystem() {
 
-	};
-
-	/*概要:リーダーと接続し、カード受付待ち状態にする関数
-	引数:なし
-	戻り値:__int64:Context:確保したリソースマネージャのアドレス
-	作成日:2017.10.10
-	作成者:K.Asada*/
-	unsigned long WaitingCard() {
-		__int64 Context = 0;    //確保したリソースマネージャのアドレスを格納する変数
-		//リソースマネージャを確保する
-		Context = Establish();
-		//リーダーの名前を照合し、目的のものと接続できているかを確認する
-		CheckReaderName(Context);
-		//確保しリソースマネージャを返却する
-		return Context;
 	}
 
-	/*概要:カードおよびリーダーとの接続を終了する関数
-	引数:SCARDCONTEXT hContext:確保していたリソースマネージャ
-		:SCARDHANDLE hCard:接続していたカード
-	戻り値:なし
-	作成日:2017.10.10
-	作成者:K.Asada*/
-	void EndConnect(unsigned long, unsigned long) {
-		//カードとの接続を終了する
-		::SCardDisConnect(hard, SCARD_LEAVE_CARD);
-		//リーダーを解放する
-		::SCardFreeMemory(hContext, ReaderName);
-		//リソースマネージャを解放する
-		::SCardReleaseContext(hContext);
-		return;
-	}
+	CONSTANTS* constants;    //定数クラスをインスタンス化
 
 	/*概要:対象のユーザーのデータが存在しているかを確認するための関数
 	引数:unsigned data:カードより取得した全データ
@@ -44,7 +18,7 @@ public class AdmissionSystem {
 	作成日：2017.10.10
 	作成者:K.Asada*/
 	std::string CheckUser(unsigned char data) {
-		std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
+	/*	std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
 		std::string name = "";       //カードより取得したユーザー名を格納するための文字列
 		std::string pass = "";       //カードより取得したユーザーのパスワードを格納するための文字列
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
@@ -63,7 +37,7 @@ public class AdmissionSystem {
 			CheckPass(name, pass, file);
 		}
 		//判定が終わったらユーザーIDを返却する
-		return uid;
+		return uid;*/
 	}
 
 	/*概要:対象のユーザーのパスワードを確認し、正しいかを判定するための関数
@@ -101,14 +75,14 @@ public class AdmissionSystem {
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	std::string GetData(unsigned char data, int index) {
-		std::string datastring = "";    //取得した文字列を格納するための文字列
+/*		std::string datastring = "";    //取得した文字列を格納するための文字列
 		//対象のブロックからすべての文字列を取得するまで繰り返す
 		for (int i = 0; i < data[index].length, i++) {
 			//1文字ずつ文字列を取得して格納していく
 			datastring += data[index][i];
 		}
 		//取得した文字列を返却する
-		return datasting;
+		return datasting;*/
 	}
 	
 	/*概要:カードへ送信するデータの組み立て、コマンドの作成を行う関数
@@ -117,7 +91,7 @@ public class AdmissionSystem {
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	unsigned char ReadySetData(std::string) {
-		//送信コマンドの初期化処理に当たる部分
+/*		//送信コマンドの初期化処理に当たる部分
 		unsigned char[2 + BLOCK_COUNT] = { {11,{0xFF,0x82,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}},
 										  {10,{0xFF,0x86,0x00,0x00,0x05,0x01,0x00,0x04,0x60,0x00}}};
 		//全データを送信するための送信コマンドを組み立てていく
@@ -145,18 +119,18 @@ public class AdmissionSystem {
 		//送信コマンドの終わりにコマンドの終了を意味するコマンドを格納する
 		senddata[2 + BLOCK_COUNT] = { -1, NULL };
 		//組み立てた送信コマンドを返却する
-		return senddata;
+		return senddata;*/
 	}
 
 	/*概要:カードへデータを送信するための関数
-	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
-	    :SCARDHANDLE hCard:取得したカード
+	引数:unsigned long hContext:取得したリソースマネージャ
+	    :unsigned long hCard:取得したカード
 		:string uid:取得したカードのユーザーID
 	戻り値:なし
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	void SetCardData(unsigned long hContext, unsigned long hCard, std::string uid) {
-		std::string setdata = "";        //送信するデータを格納するための文字列
+/*		std::string setdata = "";        //送信するデータを格納するための文字列
 		ifstream file(uis);              //送信データが格納されたファイルをユーザーIDより開く
 		unsigned char[BLOCK_COUNT] alldata = { '\0' };    //送信コマンドを格納するための文字列
 		//送信コマンドを作成する関数を呼び出す
@@ -165,39 +139,39 @@ public class AdmissionSystem {
 		Transmit(hContext, hCard, alldata);
 		//接続を終了する関数を呼び出す
 		EndConnect(hContext, hCard);
-		return;
+		return;*/
 	}
 
 	/*概要:カードからデータを受信するための関数
-	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
-	    :SCARDHANDLE hCard:取得したカード
+	引数:unsigned long hContext:取得したリソースマネージャ
+	    :unsigned long hCard:取得したカード
 	戻り値:string uid:カードより取得したユーザーID
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	std::string GetCardData(unsigned char hContext, unsigned char hCard) {
-		unsigned char[BLOCK_COUNT]getdata = { '\0' };    //取得したカードデータを格納するための変数
+	std::string GetCardData(unsigned char hContext, unsigned char hCard,std::string pass, unsigned long ActiveProtocol) {
+		ConnectCard* con;
+		unsigned char** getdata = { '\0' };    //取得したカードデータを格納するための変数
 		//送信コマンドを格納するための変数、初期値としてキー認証及びセクタ認証を格納
-		SENDCOMM SendComm[3 + BLOCK_COUNT] = { { 11,{ 0xFF,0x82,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } },
-		                                      { 10,{ 0xFF,0x86,0x00,0x00,0x05,0x01,0x00,0x04,0x60,0x00 } } };
+		CONSTANTS::SENDCOMM SendComm[21] = {constants->LOADKEY, constants->AUTHENTICATE};
 		//送信コマンドを組み立てるためのfor文
-		for (int i = 0; i < BLOCK_COUNT; i++) {
+		for (int i = 0; i < constants->BLOCK_COUNT; i++) {
 			//対象のブロックが4の倍数-1の時はセクタの終端ブロックであり、キー名等の管理用の情報が格納されているため読み飛ばす
 			if (i % 4 == 3) {
 				//次のセクタへの認証を行う（4ブロックごとにセクタが切り替わるため）
-				SendComm[2 + i] = { 10,{0xFF,0x86,0x00,0x00,0x05,0x01,0x00,i + 1,0x60,0x00} };
+				SendComm[2 + i] = { constants->AUTHENTICATE.sendLength, constants->AUTHENTICATE.sendCommand[7] += (i + 1) };
 			}//それ以外の時は通常通り対象のブロックからデータを取得する
 			else {
 				//データを受信するためのコマンドを格納する
-				SendComm[2 + i] = { 5,{0xFF,0xB0,0x00,i,0x00} };
+				SendComm[2 + i] = { constants->READCARD.sendLength, constants->READCARD.sendCommand[3] = i+ constants->BLOCK_COUNT };
 			}
 		}
 		//作成した送信コマンドの終わりに送信コマンドの終わりを示すコマンドを格納する
-		SendComm[2 + BLOCK_COUNT] = { -1,NULL };
+		SendComm[2 + constants->BLOCK_COUNT] = { -1,NULL };
 		//データを受信するコマンドを送信してデータを取得する
-		getdata = Transmit(hContext, hCard, SendComm);
+		getdata = con->Transmit(hContext, hCard, SendComm, ActiveProtocol);
 		//取得したデータのユーザ情報を照合し、ユーザIDを取得する
-		uid = CheckUser(getdata);
+//		uid = CheckUser(getdata);
 		//取得したユーザーIDを返却する
-		return uid;
+		return "aaa";
 	}
 };

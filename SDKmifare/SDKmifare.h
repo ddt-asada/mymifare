@@ -2,7 +2,12 @@
 
 #include "AdmissionSystem.h"
 #include "InputNewUserForm.h"
+#include "ConnectCard.h"
+#include "CONSTANTS.h"
+#include "PassForm.h"
 #include <iostream>
+#include <string>
+#include <fstream>
 
 namespace SDKmifare {
 
@@ -133,8 +138,9 @@ namespace SDKmifare {
 		}
 #pragma endregion
 private:unsigned long hContext = 0;		//読み込んだリソースマネージャへのポインタ
-		unsigned long hCard = NULL;		//読み込んだカードへのポインタ
-		String^ Uid = "";				//読み込んだカードのユーザーID
+		unsigned long* hCard = NULL;		//読み込んだカードへのポインタ
+		unsigned long ActivProtocol = 0;//プロトコル
+		std::string* Uid;				//読み込んだカードのユーザーID
 
 
 /*概要:作成ボタンを押したときのクリックイベント
@@ -142,22 +148,24 @@ private:unsigned long hContext = 0;		//読み込んだリソースマネージャへのポインタ
 作成者:K.Asada*/
 private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventArgs^  e) {
 	InputNewUserForm^ create = gcnew InputNewUserForm();    //新規ユーザー情報を入力するためのクラスをインスタンス化
+	AdmissionSystem* adm;
+	ConnectCard* con;
 	//新規で作成する旨を伝える
 	MessageBox::Show("新規で作成します。\n情報を入力してください。");
 	//新規情報ダイアログを開く
 	create->ShowDialog();
 	//カード待ち状態にする
-	this->hContext = adm->WaittingCard();
+	this->hContext = con->WaitingCard();
 	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
 	if (MessageBox::Show("カードをかざしてください。") == System::Windows::Forms::DialogResult::Cancel) {
 		//操作が中断された旨を表示する
 		MessageBox::Show("操作が中断されました。");
 		//接続を終了する関数を呼び出す
-		adm->EndConnect(this->hContext, this->hCard);
+		con->EndConnect(this->hContext, *this->hCard);
 	}//カードがかざされたらデータの取得に移る
-	else if (this->hCard = ::SCardConnect()) {
+	else if (this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)) {
 		//カードからデータを取得する関数を呼び出す
-		adm->SetCardData(this->hContext, this->hCard, this->Uid);
+	//	adm->SetCardData(this->hContext, this->hCard, this->Uid);
 	}
 	return;
 }
@@ -166,19 +174,20 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 作成日：2017.10.10
 作成者：K.Asada*/
 private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem adm^ = gcnew AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
+	AdmissionSystem* adm;    //カードとの接続を行ったりするクラスをインスタンス化
+	ConnectCard* con;
 	//カード待ち状態にしたうえで、リソースマネージャへのアドレスをメンバへ格納する
-	this->hContext = adm->WaittingCard();
+	this->hContext = con->WaitingCard();
 	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
 	if (MessageBox::Show("カードをかざしてください。") == System::Windows::Forms::DialogResult::Cancel) {
 		//操作が中断された旨を表示する
 		MessageBox::Show("操作が中断されました。");
 		//接続を終了する関数を呼び出す
-		adm->EndConnect(this->hContext, this->hCard);
+		con->EndConnect(this->hContext, *this->hCard);
 	}//カードがかざされたらデータの取得に移る
-	else if (this->hCard = ::SCardConnect()) {
+	else if (this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)) {
 		//カードからデータを取得する関数を呼び出す
-		adm->SetCardData(this->hContext, this->hCard, this->Uid);
+	//	adm->SetCardData(this->hContext, this->hCard, this->Uid);
 	}
 	return;
 }
@@ -188,19 +197,24 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem adm^ = gcnew AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
+	AdmissionSystem* adm;    //カードとの接続を行ったりするクラスをインスタンス化
+	ConnectCard* con;
 	//カード待ち状態にしたうえで、リソースマネージャへのアドレスをメンバへ格納する
-	this->hContext = adm->WaittingCard();
+	this->hContext = con->WaitingCard();
 	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
 	if (MessageBox::Show("カードをかざしてください。") == System::Windows::Forms::DialogResult::Cancel) {
 		//操作が中断された旨を表示する
 		MessageBox::Show("操作が中断されました。");
 		//接続を終了する関数を呼び出す
-		adm->EndConnect(this->hContext, this->hCard);
+		con->EndConnect(this->hContext, *this->hCard);
 	}//カードがかざされたらデータの取得に移る
-	else if (this->hCard = ::SCardConnect()) {
+	else if (this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)) {
+		PassForm^ pass = gcnew PassForm();
+		pass->ShowDialog();
+		std::string passtring;
+		MarshalString(pass->textBox1->Text, passtring);
 		//カードからデータを取得する関数を呼び出す
-		this->Uid = adm->GetCardData(this->hContext, this->hCard);
+		this->Uid = adm->GetCardData(this->hContext, *this->hCard, passtring, this->ActivProtocol);
 		//取得したデータから画面に表示する文字列を作成する
 		this->CreateDisp();
 	}
@@ -212,18 +226,17 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void CreateDisp() {
-	std::string showdata = "";    //表示するための文字列を格納するための文字列
+//	std::string showdata = "";    //表示するための文字列を格納するための文字
+	std::string test = *this->Uid;
 	//ユーザIDより各種情報が格納されたテキストを開く
-	ifstream file(this->Uid.c_str());
+	std::ifstream ifs(test.c_str());
 	//ストリームより文字列を取得する
-	file >> showdata;
+	ifs.is_open;
+	std::istreambuf_iterator<char> it(ifs);
+	std::istreambuf_iterator<char>last;
+	std::string showdata(it, last);
 	//文字列より表示するためのラベルを作成する
-	this->labelInfomasion->Text = showdata;
-	//ユーザの属性を判定する
-	if (this->CheckElement(this->Carddata)) {
-		//判定結果がtrueなら要注意人物である旨を表示する
-		this->labelCauntion->Text = "要注意人物です。";
-	}
+	this->labelInfomasion->Text = gcnew String(showdata.c_str());
 	return;
 }
 
@@ -232,7 +245,7 @@ private: System::Void CreateDisp() {
 作成日：2017.10.10
 作成者：K.Asada*/
 private: System::Void CheckElement(unsigned char[] elem) {
-	int check = elem[ELEMENT_INDEX];    //対象のユーザーの属性を取得する
+/*	int check = elem[ELEMENT_INDEX];    //対象のユーザーの属性を取得する
 	//ビット演算により属性に当たる部分まで移動する
 	check = check >> 19;
 	//何ビット目がたっているかを調べ、それに応じた判定を返す
@@ -245,7 +258,23 @@ private: System::Void CheckElement(unsigned char[] elem) {
 		throw gcnew System::Exception("危険人物です。入館を拒否します。");
 	}
 	//判定結果を返す
-	return check;
+	return check;*/
 }
+
+		 /*String^型をstring型へ変換する関数
+		 引数：String^ sys_string：変換対象の文字列
+		 ：string& std_string：変換後の文字列の格納先
+		 戻り値：なし
+		 作成日：2017.10.10
+		 作成者：K.Asada
+		 */
+		 void MarshalString(String^ sys_string, std::string& std_string) {
+			 using namespace Runtime::InteropServices;
+			 const char* chars =
+				 (const char*)(Marshal::StringToHGlobalAnsi(sys_string)).ToPointer();
+			 std_string = chars;
+			 Marshal::FreeHGlobal(IntPtr((void*)chars));
+			 return;
+		 }
 };
 }
