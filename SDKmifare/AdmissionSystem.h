@@ -47,8 +47,8 @@ public:
 	戻り値:bool:照合結果の正否
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	bool CheckPass(std::string name, std::string pass, std::ifstream file) {
-		std::string getname = "";        //ファイルより取得した名前を格納するための文字列
+	bool CheckPass(std::string name, std::string pass) {
+		/*std::string getname = "";        //ファイルより取得した名前を格納するための文字列
 		std::string getpass = "";        //ファイルより取得したパスを格納するための文字列
 		//ストリームより名前を取得する
 		file >> getname;
@@ -65,7 +65,7 @@ public:
 			throw gcnew System::Exception("パスワードが不正です。");
 		}
 		//ここまで来たら成功したとしてtrueを返却
-		return true;
+		return true;*/
 	}
 
 	/*概要：カードより取得したunsigned charより文字列を取得するための関数

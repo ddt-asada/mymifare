@@ -1,6 +1,8 @@
+#pragma once
+
 #include "SDKmifare.h"
 
-using namespace SDKmifare;
+using namespace sdkmifare;
 [STAThreadAttribute]
 int main() {
 	Application::Run(gcnew SDKmifare());

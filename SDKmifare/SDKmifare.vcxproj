@@ -27,12 +27,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputNewUserForm.cpp" />
+    <ClCompile Include="PassForm.cpp" />
     <ClCompile Include="SDKmifare.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdmissionSystem.h" />
     <ClInclude Include="ConnectCard.h" />
+    <ClInclude Include="CONSTANTS.h" />
     <ClInclude Include="InputNewUserForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="PassForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="SDKmifare.h">
@@ -40,6 +45,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PassForm.resx">
+      <DependentUpon>PassForm.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SDKmifare.resx">
       <DependentUpon>SDKmifare.h</DependentUpon>
     </EmbeddedResource>
@@ -129,6 +137,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

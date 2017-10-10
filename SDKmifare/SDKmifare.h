@@ -1,15 +1,15 @@
 #pragma once
 
-#include "AdmissionSystem.h"
-#include "InputNewUserForm.h"
-#include "ConnectCard.h"
-#include "CONSTANTS.h"
-#include "PassForm.h"
 #include <iostream>
 #include <string>
 #include <fstream>
+#include "AdmissionSystem.h"
+#include "ConnectCard.h"
+#include "CONSTANTS.h"
+#include "PassForm.h"
+#include "InputNewUserForm.h"
 
-namespace SDKmifare {
+namespace sdkmifare {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -214,7 +214,7 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		std::string passtring;
 		MarshalString(pass->textBox1->Text, passtring);
 		//カードからデータを取得する関数を呼び出す
-		this->Uid = adm->GetCardData(this->hContext, *this->hCard, passtring, this->ActivProtocol);
+		*this->Uid = adm->GetCardData(this->hContext, *this->hCard, passtring, this->ActivProtocol);
 		//取得したデータから画面に表示する文字列を作成する
 		this->CreateDisp();
 	}
@@ -229,9 +229,9 @@ private: System::Void CreateDisp() {
 //	std::string showdata = "";    //表示するための文字列を格納するための文字
 	std::string test = *this->Uid;
 	//ユーザIDより各種情報が格納されたテキストを開く
-	std::ifstream ifs(test.c_str());
+	std::ifstream ifs;
 	//ストリームより文字列を取得する
-	ifs.is_open;
+	ifs.open(test.c_str());
 	std::istreambuf_iterator<char> it(ifs);
 	std::istreambuf_iterator<char>last;
 	std::string showdata(it, last);
@@ -244,7 +244,7 @@ private: System::Void CreateDisp() {
 /*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
 作成日：2017.10.10
 作成者：K.Asada*/
-private: System::Void CheckElement(unsigned char[] elem) {
+private: System::Void CheckElement(unsigned char* elem) {
 /*	int check = elem[ELEMENT_INDEX];    //対象のユーザーの属性を取得する
 	//ビット演算により属性に当たる部分まで移動する
 	check = check >> 19;

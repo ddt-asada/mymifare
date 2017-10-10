@@ -6,6 +6,8 @@
 #include <assert.h>
 #include "CONSTANTS.h"
 
+#pragma comment (lib, "winscard.lib")
+
 #define PCSC_TRANS_BUFF_LEN	(262)
 #define PCSC_RECV_BUFF_LEN	(262)
 
@@ -90,9 +92,9 @@ public:
 		if (ReaderName != constants->PASORI_NAME) {
 			//リーダーが違う旨を例外として投げる
 	//		throw gcnew System::Exception(NO_READERS_ERROR);
+			EndConnect(Context);
 		}
 		//カード、リーダーとの接続を終了する
-		EndConnect(Context);
 		return;
 	}
 

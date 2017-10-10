@@ -1,6 +1,6 @@
 #pragma once
 
-namespace SDKmifare {
+namespace sdkmifare {
 
 	using namespace System;
 	using namespace System::ComponentModel;

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace SDKmifare {
+namespace sdkmifare {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -266,7 +266,7 @@ namespace SDKmifare {
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	private: System::Void InputNewUserForm_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
-		std::string filename = "";    //ファイル名を格納するための文字列
+/*		std::string filename = "";    //ファイル名を格納するための文字列
 		std::string setdata = "";     //テキストに格納するための文字列
 		//ユーザーIDをファイル名として取得する
 		filename = this->textBoxUID->Text;
@@ -285,7 +285,7 @@ namespace SDKmifare {
 		//ユーザーIDで新規にファイルを作成する
 		ifstream newuser(filename);
 		//作成したテキストファイルの中にユーザー情報を格納する
-		newuser << setdata;
+		newuser << setdata;*/
 		return;
 	}
 };
