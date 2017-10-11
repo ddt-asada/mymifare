@@ -10,7 +10,7 @@ public:
 
 	}
 
-	CONSTANTSSTRING::CONSTANTS* constants = new CONSTANTSSTRING::CONSTANTS();    //定数クラスをインスタンス化
+	CONSTANTGROUP::CONSTANTS* constants = new CONSTANTGROUP::CONSTANTS();    //定数クラスをインスタンス化
 
 	/*概要:対象のユーザーのデータが存在しているかを確認するための関数
 	引数:unsigned data:カードより取得した全データ
@@ -123,13 +123,13 @@ public:
 	}
 
 	/*概要:カードへデータを送信するための関数
-	引数:unsigned long hContext:取得したリソースマネージャ
-	    :unsigned long hCard:取得したカード
+	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
+	    :SCARDHANDLE hCard:取得したカード
 		:string uid:取得したカードのユーザーID
 	戻り値:なし
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	void SetCardData(unsigned long hContext, unsigned long hCard, std::string uid) {
+	void SetCardData(SCARDCONTEXT hContext, SCARDHANDLE hCard, std::string uid) {
 /*		std::string setdata = "";        //送信するデータを格納するための文字列
 		ifstream file(uis);              //送信データが格納されたファイルをユーザーIDより開く
 		unsigned char[BLOCK_COUNT] alldata = { '\0' };    //送信コマンドを格納するための文字列
@@ -143,18 +143,18 @@ public:
 	}
 
 	/*概要:カードからデータを受信するための関数
-	引数:unsigned long hContext:取得したリソースマネージャ
-	    :unsigned long hCard:取得したカード
+	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
+	    :SCARDHANDLE hCard:取得したカード
 	戻り値:string uid:カードより取得したユーザーID
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	std::string GetCardData(unsigned char hContext, unsigned char hCard, std::string pass, unsigned long ActiveProtocol) {
+	std::string GetCardData(SCARDCONTEXT hContext, SCARDHANDLE hCard, std::string pass, DWORD ActiveProtocol) {
 		ConnectCard* con;
 		unsigned char** getdata = { '\0' };    //取得したカードデータを格納するための変数
 		//送信コマンドを格納するための変数、初期値としてキー認証及びセクタ認証を格納
-		CONSTANTSSTRING::CONSTANTS::SENDCOMM SendComm[21] = { CONSTANTSSTRING::LOADKEY, CONSTANTSSTRING::AUTHENTICATE };
-		CONSTANTSSTRING::CONSTANTS::SENDCOMM copyauthenticate = CONSTANTSSTRING::AUTHENTICATE;
-		CONSTANTSSTRING::CONSTANTS::SENDCOMM copyreadcard = CONSTANTSSTRING::READCARD;
+		CONSTANTGROUP::CONSTANTS::SENDCOMM SendComm[21] = { CONSTANTGROUP::LOADKEY, CONSTANTGROUP::AUTHENTICATE };
+		CONSTANTGROUP::CONSTANTS::SENDCOMM copyauthenticate = CONSTANTGROUP::AUTHENTICATE;
+		CONSTANTGROUP::CONSTANTS::SENDCOMM copyreadcard = CONSTANTGROUP::READCARD;
 		//送信コマンドを組み立てるためのfor文
 		for (int i = 0; i < constants->BLOCK_COUNT; i++) {
 			//対象のブロックが4の倍数-1の時はセクタの終端ブロックであり、キー名等の管理用の情報が格納されているため読み飛ばす

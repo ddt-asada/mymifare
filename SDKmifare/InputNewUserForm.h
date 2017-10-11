@@ -34,7 +34,9 @@ namespace sdkmifare {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::TextBox^  textBoxNameaKana;
+	private: System::Windows::Forms::TextBox^  textBoxNameKana;
+	protected:
+
 	protected:
 	private: System::Windows::Forms::TextBox^  textBoxAdm;
 	private: System::Windows::Forms::TextBox^  textBoxElement;
@@ -65,7 +67,7 @@ namespace sdkmifare {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->textBoxNameaKana = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxNameKana = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxAdm = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxElement = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxPASS = (gcnew System::Windows::Forms::TextBox());
@@ -83,12 +85,12 @@ namespace sdkmifare {
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
-			// textBoxNameaKana
+			// textBoxNameKana
 			// 
-			this->textBoxNameaKana->Location = System::Drawing::Point(353, 56);
-			this->textBoxNameaKana->Name = L"textBoxNameaKana";
-			this->textBoxNameaKana->Size = System::Drawing::Size(409, 31);
-			this->textBoxNameaKana->TabIndex = 0;
+			this->textBoxNameKana->Location = System::Drawing::Point(353, 56);
+			this->textBoxNameKana->Name = L"textBoxNameKana";
+			this->textBoxNameKana->Size = System::Drawing::Size(409, 31);
+			this->textBoxNameKana->TabIndex = 0;
 			// 
 			// textBoxAdm
 			// 
@@ -253,7 +255,7 @@ namespace sdkmifare {
 			this->Controls->Add(this->textBoxPASS);
 			this->Controls->Add(this->textBoxElement);
 			this->Controls->Add(this->textBoxAdm);
-			this->Controls->Add(this->textBoxNameaKana);
+			this->Controls->Add(this->textBoxNameKana);
 			this->Name = L"InputNewUserForm";
 			this->Text = L"InputNewUserForm";
 			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &InputNewUserForm::InputNewUserForm_FormClosed);
@@ -266,26 +268,16 @@ namespace sdkmifare {
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	private: System::Void InputNewUserForm_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
-/*		std::string filename = "";    //ファイル名を格納するための文字列
-		std::string setdata = "";     //テキストに格納するための文字列
-		//ユーザーIDをファイル名として取得する
-		filename = this->textBoxUID->Text;
-		//名前を取得する、終わりで改行したいので改行文字列もセットにする
-		setdata = this->textBoxName->Text + '\n';
-		//名前のふりがなを取得する
-		setdata = this->textBoxNameaKana->Text + '\n';
-		//パスワードを取得する
-		setdata = this->textBoxPASS->Text + '\n';
-		//属性を取得する
-		setdata = this->textBoxElement->Text + '\n';
-		//権限を取得する
-		setdata = this->textBoxAdm->Text + '\n';
-		//住所を取得する
-		setdata = this->textBoxAdress->Text + '\n';
-		//ユーザーIDで新規にファイルを作成する
-		ifstream newuser(filename);
-		//作成したテキストファイルの中にユーザー情報を格納する
-		newuser << setdata;*/
+//		std::string filename = "";    //ファイル名を格納するための文字列
+	//	std::string setdata = "";     //テキストに格納するための文字列
+		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text);
+		writer->WriteLine(this->textBoxName->Text);
+		writer->WriteLine(this->textBoxNameKana->Text);
+		writer->WriteLine(this->textBoxPASS->Text);
+		writer->WriteLine(this->textBoxElement->Text);
+		writer->WriteLine(this->textBoxAdm->Text);
+		writer->WriteLine(this->textBoxAdress->Text);
+		writer->Close();
 		return;
 	}
 };

@@ -1,3 +1,4 @@
+  SDKmifare.InputNewUserForm.resources - Embedded, ContainedInManifestFile, 
   SDKmifare.PassForm.resources - Embedded, ContainedInManifestFile, 
   SDKmifare.SDKmifare.resources - Embedded, ContainedInManifestFile, 
 ImageRuntimeVersion: v4.0.30319
@@ -30,3 +31,8 @@ Struct AdmissionSystem: AutoLayout, AnsiClass, Class, Public, SequentialLayout, 
 Class sdkmifare.SDKmifare: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    UInt64* hCard : Public
+    UInt32 ActivProtocol IsLong : Public
+    std.basic_string<char\,std::char_traits<char>\,std::allocator<char> >* Uid : Public
+    CONSTANTGROUP.CONSTANTS* constants : Public

@@ -2,10 +2,12 @@
 
 #define PCSC_TRANS_BUFF_LEN	(262)
 
+#include <tchar.h>
+
 /*概要:定数クラス
 作成日:2017.10.10
 作成者:K.Asada*/
-namespace CONSTANTSSTRING {
+namespace CONSTANTGROUP {
 	class CONSTANTS {
 	public:
 		//デフォルトコンストラクタ
@@ -74,12 +76,12 @@ namespace CONSTANTSSTRING {
 		//入退館日が格納されているブロック番号
 		static const int TIMES_6_INDEX = 14;
 		//カードリーダの名前
-		static const char* PASORI_NAME;
+		static const LPTSTR PASORI_NAME;
 		//リソースマネージャの確保に失敗した時に表示するエラーメッセージ
 	//	System::String^ NO_SERVICE_ERROR = "SCardシステムでエラーが発生";
 	};
 
-	const char* CONSTANTS::PASORI_NAME = "Sony FeliCa Port/PaSoRi 3.0 0";
+	const LPTSTR CONSTANTS::PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
 	const CONSTANTS::SENDCOMM LOADKEY = { 11,{ 0xFF,0x82,0x00,0x00,0x06,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } };
 	//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
 	// General Authenticate

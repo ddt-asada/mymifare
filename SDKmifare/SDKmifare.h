@@ -137,10 +137,11 @@ namespace sdkmifare {
 
 		}
 #pragma endregion
-private:unsigned long hContext = 0;		//読み込んだリソースマネージャへのポインタ
-		unsigned long* hCard = NULL;		//読み込んだカードへのポインタ
-		unsigned long ActivProtocol = 0;//プロトコル
+private:SCARDCONTEXT hContext = 0;		//読み込んだリソースマネージャへのポインタ
+		public:SCARDHANDLE *hCard = NULL;		//読み込んだカードへのポインタ
+		DWORD ActivProtocol = 0;//プロトコル
 		std::string* Uid;				//読み込んだカードのユーザーID
+		CONSTANTGROUP::CONSTANTS* constants = new CONSTANTGROUP::CONSTANTS();
 
 
 /*概要:作成ボタンを押したときのクリックイベント
@@ -209,12 +210,12 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		con->EndConnect(this->hContext, *this->hCard);
 	}//カードがかざされたらデータの取得に移る
 	else if (this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)) {
-		PassForm^ pass = gcnew PassForm();
-		pass->ShowDialog();
-		std::string passtring;
-		MarshalString(pass->textBox1->Text, passtring);
+	//	PassForm^ pass = gcnew PassForm();
+	//	pass->ShowDialog();
+	//	std::string passtring;
+	//	MarshalString(pass->textBox1->Text, passtring);
 		//カードからデータを取得する関数を呼び出す
-		*this->Uid = adm->GetCardData(this->hContext, *this->hCard, passtring, this->ActivProtocol);
+		*this->Uid = adm->GetCardData(this->hContext, *this->hCard, "aaa", this->ActivProtocol);
 		//取得したデータから画面に表示する文字列を作成する
 		this->CreateDisp();
 	}
@@ -244,8 +245,8 @@ private: System::Void CreateDisp() {
 /*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
 作成日：2017.10.10
 作成者：K.Asada*/
-private: System::Void CheckElement(unsigned char* elem) {
-/*	int check = elem[ELEMENT_INDEX];    //対象のユーザーの属性を取得する
+private: System::Boolean CheckElement(unsigned char* elem) {
+	int check = elem[constants->ELEM_INDEX];    //対象のユーザーの属性を取得する
 	//ビット演算により属性に当たる部分まで移動する
 	check = check >> 19;
 	//何ビット目がたっているかを調べ、それに応じた判定を返す
@@ -258,7 +259,7 @@ private: System::Void CheckElement(unsigned char* elem) {
 		throw gcnew System::Exception("危険人物です。入館を拒否します。");
 	}
 	//判定結果を返す
-	return check;*/
+	return true;
 }
 
 		 /*String^型をstring型へ変換する関数

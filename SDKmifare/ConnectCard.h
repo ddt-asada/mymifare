@@ -36,16 +36,16 @@ public:
 		return (SCARD_IO_REQUEST *)SCARD_PCI_T1;
 	}
 
-	CONSTANTSSTRING::CONSTANTS* constants = new CONSTANTSSTRING::CONSTANTS();    //定数クラスをインスタンス化
+	CONSTANTGROUP::CONSTANTS* constants = new CONSTANTGROUP::CONSTANTS();    //定数クラスをインスタンス化
 
 	/*概要：機器との通信を行うためのリソースマネージャを確保するための関数
 	引数：なし
-	戻り値：unsigned long hContext確保したリソースマネージャ
+	戻り値：SCARDCONTEXT hContext確保したリソースマネージャ
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	unsigned long EstablishContext() {
+	SCARDCONTEXT EstablishContext() {
 		SCARDCONTEXT hContext = 0;        //確保したリソースマネージャのアドレス
-		unsigned int lResult;                     //リソースマネージャを確保した際の結果を格納するための変数
+		LONG lResult;                     //リソースマネージャを確保した際の結果を格納するための変数
 		//リソースマネージャを確保し、その結果を取得する
 		lResult = ::SCardEstablishContext(SCARD_SCOPE_USER, NULL, NULL, &hContext);
 		//もし確保に失敗していたら例外を投げる
@@ -66,15 +66,15 @@ public:
 	}
 
 	/*概要：確保したリソースマネージャの名前が目的のカードリーダの名前と一致しているかを調べるための関数
-	引数：unsigned long Context：確保したリソースマネージャ
+	引数：SCARDCONTEXT Context：確保したリソースマネージャ
 	戻り値；なし
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	void CheckReaderName(unsigned long Context) {
+	void CheckReaderName(SCARDCONTEXT Context) {
 //		std::cout >> constants->PASORI_NAME.c_str();
 		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
-		unsigned long dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
-		unsigned long lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
+		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
+		LONG lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
 		//確保したリソースマネージャのリーダの名前調べる
 		lResult = ::SCardListReaders(Context, NULL, (LPTSTR)&ReaderName, &dwAutoAllocate);
 		//失敗したら例外を投げる
@@ -90,22 +90,22 @@ public:
 			}
 		}
 		//目的のリーダーの名前と違っていたらその旨を例外として伝える
-/*		if (ReaderName != (LPTSTR)constants->PASORI_NAME) {
+//		if (ReaderName != constants->PASORI_NAME) {
 			//リーダーが違う旨を例外として投げる
 		//	throw gcnew System::Exception(NO_READERS_ERROR);
-			EndConnect(Context);
-		}*/
+	//		EndConnect(Context);
+//		}
 		//カード、リーダーとの接続を終了する
 		return;
 	}
 
 	/*概要：カードへデータ送受信などのコマンドを送信するための関数
-	引数：unsigned long：リーダーへのリソースマネージャ
-		：unsigned long：カードへのハンドル
+	引数：SCARDCONTEXT：リーダーへのリソースマネージャ
+		：SCARDHANDLE：カードへのハンドル
 		：SENDCOMM SendComm：カードへ送信するコマンド
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	unsigned char** Transmit(unsigned long hContext, unsigned long hCard, CONSTANTSSTRING::CONSTANTS::SENDCOMM SendComm[],unsigned long ActiveProtocol) {
+	unsigned char** Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, CONSTANTGROUP::CONSTANTS::SENDCOMM SendComm[],unsigned long ActiveProtocol) {
 		unsigned char RecvBuf[PCSC_RECV_BUFF_LEN] = { '\0' };
 		unsigned char* RetBuf[16] = { '\0' };
 		unsigned long ResponseSize = 0;
@@ -127,6 +127,7 @@ public:
 			for (int j = 0; j < ResponseSize - 2; j++) {
 				//受け取ったレスポンスを返却用の文字列に格納する
 				RetBuf[i][j] = RecvBuf[j];
+				std::cout << RecvBuf[j];
 			}
 		}
 		System::Windows::Forms::MessageBox::Show("aaa");
@@ -135,16 +136,21 @@ public:
 	}
 
 	/*概要:カードリーダの状態を取得し、カードが置かれたときにカードを読み込む関数
-	引数:unsigned long hContext:確保したリソースマネージャのアドレス
-	    :unsigned long *hCard:カードへのポインタ
-	戻り値:unsigned long ActiveProtocol:開通したプロトコル
+	引数:SCARDCONTEXT hContext:確保したリソースマネージャのアドレス
+	    :SCARDHANDLE *hCard:カードへのポインタ
+	戻り値:DWORD ActiveProtocol:開通したプロトコル
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	unsigned long CardConnect(unsigned long hContext, unsigned long *hCard) {
-		unsigned long lResult = 0;        //接続結果を格納するための変数
+	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE *hCard) {
+		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
-		unsigned long ActiveProtocol = 0; //プロトコル
-		//リーダーの状態が変化（カードがかざされたときに）その状態を読み取る関数
+		DWORD ActiveProtocol = 0; //プロトコル
+		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
+		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
+	//	LONG lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
+													  //確保したリソースマネージャのリーダの名前調べる
+		lResult = ::SCardListReaders(hContext, NULL, (LPTSTR)&ReaderName, &dwAutoAllocate);
+/*		//リーダーの状態が変化（カードがかざされたときに）その状態を読み取る関数
 		lResult = ::SCardGetStatusChange(hContext, 0, &readerstate, 1);
 		//もしコマンドの送信に失敗したら例外を投げる
 		if (lResult != SCARD_S_SUCCESS) {
@@ -155,9 +161,9 @@ public:
 				//接続を終了する
 				EndConnect(hContext, *hCard);
 			}
-		}
+		}*/
 		//カードとの接続を開始する
-		lResult = ::SCardConnect(hContext, (LPWSTR)constants->PASORI_NAME, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, (LPSCARDHANDLE)&hCard, &ActiveProtocol);
+		lResult = ::SCardConnect(hContext, ReaderName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &ActiveProtocol);
 		//接続結果が失敗なら例外を投げる
 		if (lResult != SCARD_S_SUCCESS) {
 			//カードがないことのエラーなら
@@ -177,11 +183,11 @@ public:
 
 	/*概要:リーダーと接続し、カード受付待ち状態にする関数
 	引数:なし
-	戻り値:__int64:Context:確保したリソースマネージャのアドレス
+	戻り値:SCARDCONTEXT:Context:確保したリソースマネージャのアドレス
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	unsigned long WaitingCard() {
-		unsigned long Context = 0;    //確保したリソースマネージャのアドレスを格納する変数
+	SCARDCONTEXT WaitingCard() {
+		SCARDCONTEXT Context = 0;    //確保したリソースマネージャのアドレスを格納する変数
 		//リソースマネージャを確保する
 		Context = EstablishContext();
 		//リーダーの名前を照合し、目的のものと接続できているかを確認する
@@ -191,12 +197,12 @@ public:
 	}
 
 	/*概要:カードおよびリーダーとの接続を終了する関数
-	引数:unsigned long hContext:確保していたリソースマネージャ
-	:unsigned long hCard:接続していたカード
+	引数:SCARDCONTEXT hContext:確保していたリソースマネージャ
+	:SCARDHANDLE hCard:接続していたカード
 	戻り値:なし
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	void EndConnect(unsigned long hContext, unsigned long hCard) {
+	void EndConnect(SCARDCONTEXT hContext, SCARDHANDLE hCard) {
 		//カードとの接続を終了する
 		::SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 		//リーダーを解放する
@@ -207,11 +213,11 @@ public:
 	}
 
 	/*概要:リーダーとの接続を終了する関数
-	引数:unsigned long hContext:確保していたリソースマネージャ
+	引数:SCARDCONTEXT hContext:確保していたリソースマネージャ
 	戻り値:なし
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	void EndConnect(unsigned long hContext) {
+	void EndConnect(SCARDCONTEXT hContext) {
 		//リーダーを解放する
 		::SCardFreeMemory(hContext, constants->PASORI_NAME);
 		//リソースマネージャを解放する

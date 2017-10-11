@@ -45,6 +45,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="InputNewUserForm.resx">
+      <DependentUpon>InputNewUserForm.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PassForm.resx">
       <DependentUpon>PassForm.h</DependentUpon>
     </EmbeddedResource>
