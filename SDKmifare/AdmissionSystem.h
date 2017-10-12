@@ -1,6 +1,13 @@
 #pragma once
 
+#include <ostream>
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <time.h>
+#include <vector>
+#include <bitset>
+#include <stdio.h>
 #include "ConnectCard.h"
 #include "CONSTANTS.h"
 
@@ -9,18 +16,13 @@ public:
 	AdmissionSystem() {
 
 	}
-
-	CONSTANTGROUP::CONSTANTS* constants = new CONSTANTGROUP::CONSTANTS();    //定数クラスをインスタンス化
-
 	/*概要:対象のユーザーのデータが存在しているかを確認するための関数
 	引数:unsigned data:カードより取得した全データ
 	戻り値:string uid:カードより取得したユーザーID
 	作成日：2017.10.10
 	作成者:K.Asada*/
-	std::string CheckUser(unsigned char data) {
-	/*	std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
-		std::string name = "";       //カードより取得したユーザー名を格納するための文字列
-		std::string pass = "";       //カードより取得したユーザーのパスワードを格納するための文字列
+	std::string CheckUser(std::vector<std::vector<unsigned char>> data, std::string pass) {
+		std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
 		uid = GetData(data, ID_INDEX);
 		//ユーザーIDをファイル名としたファイルが開けないときはユーザーが存在していないとして例外を投げる
@@ -37,7 +39,7 @@ public:
 			CheckPass(name, pass, file);
 		}
 		//判定が終わったらユーザーIDを返却する
-		return uid;*/
+		return uid;
 	}
 
 	/*概要:対象のユーザーのパスワードを確認し、正しいかを判定するための関数
@@ -90,36 +92,74 @@ public:
 	戻り値:unsigned char:データを送信するためのコマンド
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	unsigned char ReadySetData(std::string) {
-/*		//送信コマンドの初期化処理に当たる部分
-		unsigned char[2 + BLOCK_COUNT] = { {11,{0xFF,0x82,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}},
-										  {10,{0xFF,0x86,0x00,0x00,0x05,0x01,0x00,0x04,0x60,0x00}}};
+	CONSTANTGROUP::SENDCOMM ReadySetData(std::string uid, CONSTANTGROUP::SENDCOMM senddataa[]) {
+		CONSTANTGROUP::SENDCOMM senddata[22];
+		senddata[0] = CONSTANTGROUP::LOADKEY;
+		senddata[1] = CONSTANTGROUP::AUTHENTICATE;
+		CONSTANTGROUP::SENDCOMM copyauthenticate = CONSTANTGROUP::AUTHENTICATE;    //認証コマンドのコピー
+		CONSTANTGROUP::SENDCOMM copysendcard = CONSTANTGROUP::SENDCARD;            //データ送信コマンドのコピー
+		char setdata;             //ファイルより取得した文字列を格納する
+		int blockindex;           //書き込み対象のブロック
+		std::string bitstr;
+		std::string setstr = "aaa";       //コマンドへセットする文字列
+		std::ifstream ifs(uid);   //カードへ送信するデータが格納されたテキストを開く
 		//全データを送信するための送信コマンドを組み立てていく
-		for (int i = 0; i < BLOCK_COUNT; i++) {
-			//4の倍数-1のセクターの終端ブロックでキーが格納されているため編集したくないので読み飛ばす
-			if (i % 4 == 3) {
-				//次のセクターへの認証を行うコマンドをセットする
-				senddata[2 + i] = { 10,{0xFF,0x86,0x00,0x00,0x05,0x01,0x00,i + 1,0x60,0x00} };
-			}//それ以外の時は通常通りデータを送信するためのコマンドを組み立てていく
-			else {
-				//文字列からデータを取り出し、コマンドを組み立てていく
-				for (int j = 0;; j++) {
-					//改行文字にたどり着くまで文字列を格納していく
-					if (setdata != '\n') {
-						//送信コマンドを組み立てていく
-						senddata[2 + i].bCommand[j] = setdata;
-					}//改行文字にたどり着いたらコマンドの組み立てを終了して次のブロックに移る
+		for (int i = 0; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
+			//書き込み対象のブロック数を取得する
+			blockindex = i + CONSTANTGROUP::BEGIN_BLOCK;
+			//4の倍数-1はセクターの終端ブロックでキーが格納されているため編集したくないので読み飛ばすための分岐
+			if (blockindex % 4 != 3) {
+				//送信コマンドの送信先ブロックを書き換える
+				copysendcard.sendCommand[3] = i + CONSTANTGROUP::BEGIN_BLOCK;
+				//書き込みブロックの後半部分は年月日なので別処理するための分岐
+				if (blockindex >= 20) {
+					ifs >> bitstr;
+					//送信コマンドを組み立てるためのループ
+					for (int j = 0; j < 16; j++) {
+						//ファイルにデータが存在していれば分岐
+						if ((j + 1) * 8 <= bitstr.size() && !ifs.eof()) {
+							//テキストから空白文字まで取得する
+							setstr = bitstr.substr(j * 8, 8);
+							//送信コマンドとして2進数の整数として取得し、charに8格納する
+							copysendcard.sendCommand[5 + j] = std::stoi(setstr, nullptr, 2);
+						}//データがないときは空文字として0を送信コマンドにセットする
+						else {
+							copysendcard.sendCommand[5 + j] = 0;
+						}
+					}
+					//組み立てた送信コマンドを格納する
+					senddata[2 + i] = copysendcard;
+				}
+				//16バイト分の送信コマンドを組み立てていく
+				for (int j = 0; j < 16; j++) {
+					ifs.get(setdata);//ファイルから1バイト分データを取り出す
+					//改行文字にたどり着くまたはファイル終端で分岐
+					if (!ifs.eof()) {
+						if (setdata == '\n') {
+							ifs.get(setdata);
+						}
+						//送信コマンドを書き換えていく
+						copysendcard.sendCommand[5 + j] = setdata;
+					}//格納する文字列がないときは送信コマンドに空を示す'0'を格納する
 					else {
-						//ループを抜ける
-						break;
+						copysendcard.sendCommand[5 + j] = 0;
 					}
 				}
+				ifs.get(setdata);//ファイルから1バイト分データを取り出す
+				//組み立てた送信コマンドを格納する
+				senddata[2 + i] = copysendcard;
+			}
+			else {//読み飛ばすための処理
+				//認証コマンドの認証先ブロックを書き換える
+				copyauthenticate.sendCommand[7] = (i + 1 + CONSTANTGROUP::BEGIN_BLOCK);
+				//次のセクターへの認証を行うコマンドをセットする
+				senddata[2 + i] = copyauthenticate;
 			}
 		}
 		//送信コマンドの終わりにコマンドの終了を意味するコマンドを格納する
-		senddata[2 + BLOCK_COUNT] = { -1, NULL };
+		senddata[2 + CONSTANTGROUP::BLOCK_COUNT] = { -1, NULL };
 		//組み立てた送信コマンドを返却する
-		return senddata;*/
+		return *senddata;
 	}
 
 	/*概要:カードへデータを送信するための関数
@@ -130,16 +170,15 @@ public:
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	void SetCardData(SCARDCONTEXT hContext, SCARDHANDLE hCard, std::string uid) {
-/*		std::string setdata = "";        //送信するデータを格納するための文字列
-		ifstream file(uis);              //送信データが格納されたファイルをユーザーIDより開く
-		unsigned char[BLOCK_COUNT] alldata = { '\0' };    //送信コマンドを格納するための文字列
+		ConnectCard* con = new ConnectCard();    //カード通信クラスをインスタンス化
+		CONSTANTGROUP::SENDCOMM senddata[22];    //送信コマンドを格納するための構造体
 		//送信コマンドを作成する関数を呼び出す
-		alldata = ReadySetData(setdata);
+		ReadySetData(uid, senddata);
 		//カードへコマンドを送信する関数を呼び出す
-		Transmit(hContext, hCard, alldata);
+		con->Transmit(hContext, hCard, senddata, 0);
 		//接続を終了する関数を呼び出す
-		EndConnect(hContext, hCard);
-		return;*/
+		con->EndConnect(hContext, hCard);
+		return;
 	}
 
 	/*概要:カードからデータを受信するための関数
@@ -148,33 +187,175 @@ public:
 	戻り値:string uid:カードより取得したユーザーID
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	std::string GetCardData(SCARDCONTEXT hContext, SCARDHANDLE hCard, std::string pass, DWORD ActiveProtocol) {
-		ConnectCard* con;
-		unsigned char** getdata = { '\0' };    //取得したカードデータを格納するための変数
-		//送信コマンドを格納するための変数、初期値としてキー認証及びセクタ認証を格納
-		CONSTANTGROUP::CONSTANTS::SENDCOMM SendComm[21] = { CONSTANTGROUP::LOADKEY, CONSTANTGROUP::AUTHENTICATE };
-		CONSTANTGROUP::CONSTANTS::SENDCOMM copyauthenticate = CONSTANTGROUP::AUTHENTICATE;
-		CONSTANTGROUP::CONSTANTS::SENDCOMM copyreadcard = CONSTANTGROUP::READCARD;
-		//送信コマンドを組み立てるためのfor文
-		for (int i = 0; i < constants->BLOCK_COUNT; i++) {
-			//対象のブロックが4の倍数-1の時はセクタの終端ブロックであり、キー名等の管理用の情報が格納されているため読み飛ばす
-			if (i % 4 == 3) {
-				//次のセクタへの認証を行う（4ブロックごとにセクタが切り替わるため）
-				SendComm[2 + i] = { copyauthenticate.sendLength, copyauthenticate.sendCommand[7] += (i + 1) };
-			}//それ以外の時は通常通り対象のブロックからデータを取得する
+	std::string GetCardData(std::string pass) {
+		std::vector<CONSTANTGROUP::SENDCOMM>sendcomm;        //受信コマンドを格納するための配列
+		std::vector<std::vector<unsigned char>> recvdata = { {'\0'} };    //受信データを格納するための配列
+		std::string uid;
+		ConnectCard* con = new ConnectCard();                //カードとの通信を行うクラスをインスタンス化
+		//受信コマンドを組み立てる関数を呼び出す
+		sendcomm = ReadyGetData();
+		//受信コマンドをカードへ送信してデータを受け取る
+		recvdata = con->Transmit(sendcomm);
+		//ユーザー情報を確認する関数を呼び出す
+		CheckUser(recvdata, pass);
+		//入館時間を取得する関数を呼び出す
+		SetAdmissionTimes(uid);
+		//入館時間をカードに記録させる
+		sendcomm = ReadySetTimes(uid);
+		//カードへデータを送信する
+		con->Transmit(sendcomm);
+		return;
+	}
+
+	/*概要:データ受信コマンドを作成するための関数
+	作成日:2017.10.12
+	作成者:K.Asada*/
+	std::vector<CONSTANTGROUP::SENDCOMM> ReadyGetData() {
+		CONSTANTGROUP::SENDCOMM authenticate = CONSTANTGROUP::AUTHENTICATE;    //認証キーコマンドのコピーを作る
+		CONSTANTGROUP::SENDCOMM readcard = CONSTANTGROUP::READCARD;             //受信コマンドのコピーを作る
+		std::vector<CONSTANTGROUP::SENDCOMM> sendcomm;                         //組み立てたコマンドを格納するための配列
+		int blockindex = 0;                                                    //認証先ブロックを格納する変数
+		//受信コマンドの初期値としてキー認証コマンドをセットする
+		sendcomm.push_back(CONSTANTGROUP::LOADKEY);
+		//受信コマンドの初期値としてブロック認証コマンドをセットする
+		sendcomm.push_back(CONSTANTGROUP::AUTHENTICATE);
+		//受信コマンドを組み立てていく
+		for (int i = CONSTANTGROUP::BEGIN_BLOCK; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
+			//読込先のブロックを取得する
+			blockindex = i;
+			//読込先がセクターの終端ブロックの場合は読み飛ばす
+			if (blockindex % 4 != 3) {
+				//読込先ブロックを設定する
+				readcard.sendCommand[3] = blockindex;
+				//コマンドを組み立てる
+				sendcomm.push_back(readcard);
+			}//読み飛ばすと同時に次のセクターに入るための準備をする
 			else {
-				//データを受信するためのコマンドを格納する
-				SendComm[2 + i] = { copyreadcard.sendLength, copyreadcard.sendCommand[3] = i+ constants->BLOCK_COUNT };
+				//セクター認証コマンドの認証先を設定する
+				authenticate.sendCommand[7] = blockindex + 1;
+				//コマンドを組み立てる
+				sendcomm.push_back(authenticate);
 			}
 		}
-		//作成した送信コマンドの終わりに送信コマンドの終わりを示すコマンドを格納する
-		SendComm[2 + constants->BLOCK_COUNT] = { -1,NULL };
-		System::Windows::Forms::MessageBox::Show("aaa");
-		//データを受信するコマンドを送信してデータを取得する
-		getdata = con->Transmit(hContext, hCard, SendComm, ActiveProtocol);
-		//取得したデータのユーザ情報を照合し、ユーザIDを取得する
-//		uid = CheckUser(getdata);
-		//取得したユーザーIDを返却する
-		return "aaa";
+		//最後にコマンドの終わりを示すコマンドを格納する
+		sendcomm.push_back({ -1, NULL });
+		//組み立てたコマンドを返す
+		return sendcomm;
+	}
+
+	/*概要:入退館日の取得及び年月の確認を行う関数
+	引数:string uid:チェック対象のユーザのID
+	戻り値:なし
+	作成日：2017.10.11
+	作成者:K.Asada*/
+	void SetAdmissionTimes(std::string uid) {
+		int times;            //取得した日時分を分に変換したものを格納する
+		//年月をチェックする関数を呼び出し、年月が現在年月と異なっていたら書き換える
+		CheckYears(uid);
+		std::ofstream ofs(uid, std::ios::app);    //データを書き込む対象のファイルを開く
+		//関数より現在日時分を取得する
+		times = GetAdmissionTime();
+		//取得した日時分をファイルへ書き出す
+		ofs << std::bitset<16>(times);
+		//書き出しを終えたら閉じる
+		ofs.close();
+		return;
+	}
+
+	/*概要:現在日時分を分に変換して取得する関数
+	引数:なし
+	戻り値:char times:分
+	作成日：2017.10.11
+	作成者:K.Asada*/
+	int GetAdmissionTime() {
+		time_t now = time(NULL);          //現在時刻を取得するため
+		struct tm *pnow = localtime(&now);//現在時刻を取得するための構造体を宣言
+		int times;                       //取得した現在時刻を格納するための変数
+		//現在日時分を分に換算して格納する
+		times = ((pnow->tm_mday * 24 + pnow->tm_hour) * 60 + pnow->tm_min);
+		//取得した時間を返却する
+		return times;
+	}
+
+	/*概要:ユーザ情報に含まれる年月が古くないかを確認する関数
+	引数:string uid:チェック対象のユーザのID
+	戻り値:なし
+	作成日:2017.10.11
+	作成者:K.Asada*/
+	void CheckYears(std::string uid) {
+		time_t now = time(NULL);          //現在時刻を取得するため
+		struct tm *pnow = localtime(&now);//現在時刻を取得するための構造体を宣言
+		int years;                       //取得した現在時刻を格納するための変数
+		std::vector<std::string> admyear;                     //ファイルから取得した年月を格納するための変数
+		std::string tmp;
+		//現在年月を取得する
+		years = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
+		//ファイルから年月を取得するためのストリームを開く
+		std::ifstream ifs(uid);
+		//ファイルから一行ごとにデータをすべて取得する
+		for (int i = 0; !ifs.eof(); i++) {
+			//1行ずつ取得する
+			std::getline(ifs, tmp);
+			admyear.push_back(tmp);
+		}
+		//取得したデータの年月が現在の年月と異なっていれば上書きする
+		if (admyear[5] != std::to_string(years)) {
+			std::string bit(std::bitset<32>(years).to_string<char, std::char_traits<char>, std::allocator<char> >());
+			//対象を上書きする
+			admyear[5] = bit;
+			//ファイルを更新するために開く
+			std::ofstream ofs(uid);
+			std::string tmp;
+			//一行ずつ書き込んでいく
+			for (int i = 0; i < admyear.size(); i++) {
+				tmp = admyear[i];
+				if (i + 1 == admyear.size()) {
+					ofs << tmp;
+				}
+				else {
+					//一行ずつ書き込む
+					ofs << tmp + '\n';
+				}
+			}
+		}
+		return;
+	}
+
+	/*概要:年月日などのbitデータを送信するためのコマンドを作る関数
+	作成日:2017.10.12
+	作成者:K.Asada*/
+	std::vector<CONSTANTGROUP::SENDCOMM> ReadySetTimes(std::string uid) {
+		std::vector<CONSTANTGROUP::SENDCOMM> sendtime;
+		CONSTANTGROUP::SENDCOMM authenticate = CONSTANTGROUP::AUTHENTICATE;
+		CONSTANTGROUP::SENDCOMM sendcard = CONSTANTGROUP::SENDCARD;
+		std::string gettime;
+		std::string settime;
+		int index = -8;
+		sendtime.push_back(CONSTANTGROUP::LOADKEY);
+		authenticate.sendCommand[7] = CONSTANTGROUP::BIT_BLOCK;
+		sendtime.push_back(authenticate);
+		std::ifstream ifs(uid);
+		getline(ifs, gettime);
+		getline(ifs, gettime);
+		for (int i = CONSTANTGROUP::BEGIN_BLOCK; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
+			if (i % 4 != 3) {
+				for (int j = 0; j < 16; j++) {
+					settime = gettime.substr(index += 8, 8);
+					if (settime != "        ") {
+						sendcard.sendCommand[5 + j] = std::stoi(settime, nullptr, 2);
+					}
+					else {
+						sendcard.sendCommand[5 + j] = 0;
+					}
+					sendcard.sendCommand[3] = i;
+					sendtime.push_back(sendcard);
+				}
+			}
+			else {
+				authenticate.sendCommand[7] = i + 1;
+				sendtime.push_back(authenticate);
+			}
+		}
+		return sendtime;
 	}
 };

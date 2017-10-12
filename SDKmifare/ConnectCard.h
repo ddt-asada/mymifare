@@ -36,10 +36,8 @@ public:
 		return (SCARD_IO_REQUEST *)SCARD_PCI_T1;
 	}
 
-	CONSTANTGROUP::CONSTANTS* constants = new CONSTANTGROUP::CONSTANTS();    //定数クラスをインスタンス化
-
 	/*概要：機器との通信を行うためのリソースマネージャを確保するための関数
-	引数：なし
+	引数：なし222222222222
 	戻り値：SCARDCONTEXT hContext確保したリソースマネージャ
 	作成日：2017.10.10
 	作成者：K.Asada*/
@@ -105,17 +103,53 @@ public:
 		：SENDCOMM SendComm：カードへ送信するコマンド
 	作成日：2017.10.10
 	作成者：K.Asada*/
-	unsigned char** Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, CONSTANTGROUP::CONSTANTS::SENDCOMM SendComm[],unsigned long ActiveProtocol) {
+		std::vector<std::vector<unsigned char>> Transmit(std::vector<CONSTANTGROUP::SENDCOMM> SendComm) {
+		LONG lResult = 0;        //接続結果を格納するための変数
+		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
+		SCARDHANDLE card = NULL;
+	//	DWORD ActiveProtocol = 0; //プロトコル
+		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
+		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
+													  //	LONG lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
+													  //確保したリソースマネージャのリーダの名前調べる
+		lResult = ::SCardListReaders(hContext, NULL, (LPTSTR)&ReaderName, &dwAutoAllocate);
+		/*		//リーダーの状態が変化（カードがかざされたときに）その状態を読み取る関数
+		lResult = ::SCardGetStatusChange(hContext, 0, &readerstate, 1);
+		//もしコマンドの送信に失敗したら例外を投げる
+		if (lResult != SCARD_S_SUCCESS) {
+		//エラー内容により分岐
+		if (lResult == SCARD_E_NO_READERS_AVAILABLE) {
+		//カードリーダが接続されていない旨の例外を投げる
+		//throw gcnew System::Exception("カードリーダーが接続されていません");
+		//接続を終了する
+		EndConnect(hContext, *hCard);
+		}
+		}*/
+		//カードとの接続を開始する
+		lResult = ::SCardConnect(hContext, ReaderName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &card, &ActiveProtocol);
+		//接続結果が失敗なら例外を投げる
+		if (lResult != SCARD_S_SUCCESS) {
+			//カードがないことのエラーなら
+			if (lResult == SCARD_W_REMOVED_CARD) {
+				//カードがない旨を伝えるエラーを投げる
+				throw gcnew System::Exception("カードがありません");
+			}//それ以外のエラーの時は別の例外を伝える
+			else {
+				throw gcnew System::Exception("ERROR");
+			}
+			//接続を終了する
+			//		EndConnect(hContext, *hCard);
+		}
 		unsigned char RecvBuf[PCSC_RECV_BUFF_LEN] = { '\0' };
 		unsigned char* RetBuf[16] = { '\0' };
 		unsigned long ResponseSize = 0;
-		unsigned long lResult;
+		//unsigned long lResult;
 		//全てのコマンドを送信するまで繰り返す
 		for (int i = 0; SendComm[i].sendLength > -1; i++) {
 			//受信の最大サイズを取得する
 			ResponseSize = sizeof(RecvBuf);
 			//コマンドを送信して、結果とレスポンスへのポインタを取得する
-			lResult = ::SCardTransmit(hCard, CardProtocol2PCI(ActiveProtocol), SendComm[i].sendCommand, SendComm[i].sendLength, NULL, RecvBuf, &ResponseSize);
+			lResult = ::SCardTransmit(card, CardProtocol2PCI(ActiveProtocol), SendComm[i].sendCommand, SendComm[i].sendLength, NULL, RecvBuf, &ResponseSize);
 			//コマンドの送信に失敗したらエラーを投げる（ここではコマンドが送れたかどうかのみ判定）
 			if (lResult != SCARD_S_SUCCESS) {
 				//例外を投げる
@@ -123,14 +157,23 @@ public:
 				//リーダーとの通信、カードとの通信を終了する
 				EndConnect(hContext, hCard);
 			}
+			for (UINT uiRespIdx = 0; uiRespIdx < ResponseSize; uiRespIdx++) {
+				_ftprintf_s(stdout, _T("%02X"), RecvBuf[uiRespIdx]);
+				if ((uiRespIdx + 1) >= ResponseSize) {
+					_ftprintf_s(stdout, _T("\n"));
+				}
+				else {
+					_ftprintf_s(stdout, _T(" "));
+				}
+			}
 			//受け取ったすべてのレスポンスを格納する（後ろ2文字は送信正否の判定なので格納しないのため）
-			for (int j = 0; j < ResponseSize - 2; j++) {
+/*			for (int j = 0; j < ResponseSize - 2; j++) {
 				//受け取ったレスポンスを返却用の文字列に格納する
 				RetBuf[i][j] = RecvBuf[j];
-				std::cout << RecvBuf[j];
 			}
+			_ftprintf_s(stdout, _T("%02X"), RecvBuf[ResponseSize -2]);
+			_ftprintf_s(stdout, _T("%02X"), RecvBuf[ResponseSize - 1]);*/
 		}
-		System::Windows::Forms::MessageBox::Show("aaa");
 		//作成した文字列を返却する
 		return RetBuf;
 	}
@@ -141,9 +184,10 @@ public:
 	戻り値:DWORD ActiveProtocol:開通したプロトコル
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE *hCard) {
+	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE hCard) {
 		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
+		SCARDHANDLE card = NULL;
 		DWORD ActiveProtocol = 0; //プロトコル
 		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
@@ -175,9 +219,8 @@ public:
 				throw gcnew System::Exception("ERROR");
 			}
 			//接続を終了する
-			EndConnect(hContext, *hCard);
+	//		EndConnect(hContext, *hCard);
 		}
-		System::Windows::Forms::MessageBox::Show("aaa");
 		return ActiveProtocol;
 	}
 
@@ -206,7 +249,7 @@ public:
 		//カードとの接続を終了する
 		::SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 		//リーダーを解放する
-		::SCardFreeMemory(hContext, constants->PASORI_NAME);
+		::SCardFreeMemory(hContext, CONSTANTGROUP::PASORI_NAME);
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;
@@ -219,7 +262,7 @@ public:
 	作成者：K.Asada*/
 	void EndConnect(SCARDCONTEXT hContext) {
 		//リーダーを解放する
-		::SCardFreeMemory(hContext, constants->PASORI_NAME);
+		::SCardFreeMemory(hContext, CONSTANTGROUP::PASORI_NAME);
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;

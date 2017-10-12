@@ -38,8 +38,8 @@ namespace sdkmifare {
 	protected:
 
 	protected:
-	private: System::Windows::Forms::TextBox^  textBoxAdm;
-	private: System::Windows::Forms::TextBox^  textBoxElement;
+
+
 	private: System::Windows::Forms::TextBox^  textBoxPASS;
 	private: System::Windows::Forms::TextBox^  textBoxUID;
 	private: System::Windows::Forms::TextBox^  textBoxAdress;
@@ -53,6 +53,15 @@ namespace sdkmifare {
 	private: System::Windows::Forms::Label^  label14;
 	private: System::Windows::Forms::Button^  buttonOK;
 	private: System::Windows::Forms::Button^  buttonCancel;
+	private: System::Windows::Forms::ComboBox^  comboBoxElement;
+	private: System::Windows::Forms::ComboBox^  comboBoxAdmin;
+	private: System::Windows::Forms::ComboBox^  comboBoxOccupations;
+	private: System::Windows::Forms::ComboBox^  comboBoxPosition;
+	private: System::Windows::Forms::ComboBox^  comboBoxDepart;
+	private: System::Windows::Forms::ComboBox^  comboBox6;
+	private: System::Windows::Forms::Label^  label2;
+	private: System::Windows::Forms::Label^  label3;
+	private: System::Windows::Forms::Label^  label4;
 
 	private:
 		/// <summary>
@@ -68,8 +77,6 @@ namespace sdkmifare {
 		void InitializeComponent(void)
 		{
 			this->textBoxNameKana = (gcnew System::Windows::Forms::TextBox());
-			this->textBoxAdm = (gcnew System::Windows::Forms::TextBox());
-			this->textBoxElement = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxPASS = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxUID = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxAdress = (gcnew System::Windows::Forms::TextBox());
@@ -83,56 +90,51 @@ namespace sdkmifare {
 			this->label14 = (gcnew System::Windows::Forms::Label());
 			this->buttonOK = (gcnew System::Windows::Forms::Button());
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
+			this->comboBoxElement = (gcnew System::Windows::Forms::ComboBox());
+			this->comboBoxAdmin = (gcnew System::Windows::Forms::ComboBox());
+			this->comboBoxOccupations = (gcnew System::Windows::Forms::ComboBox());
+			this->comboBoxPosition = (gcnew System::Windows::Forms::ComboBox());
+			this->comboBoxDepart = (gcnew System::Windows::Forms::ComboBox());
+			this->comboBox6 = (gcnew System::Windows::Forms::ComboBox());
+			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->label3 = (gcnew System::Windows::Forms::Label());
+			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// textBoxNameKana
 			// 
-			this->textBoxNameKana->Location = System::Drawing::Point(353, 56);
+			this->textBoxNameKana->Location = System::Drawing::Point(484, 54);
 			this->textBoxNameKana->Name = L"textBoxNameKana";
 			this->textBoxNameKana->Size = System::Drawing::Size(409, 31);
-			this->textBoxNameKana->TabIndex = 0;
-			// 
-			// textBoxAdm
-			// 
-			this->textBoxAdm->Location = System::Drawing::Point(353, 288);
-			this->textBoxAdm->Name = L"textBoxAdm";
-			this->textBoxAdm->Size = System::Drawing::Size(409, 31);
-			this->textBoxAdm->TabIndex = 12;
-			// 
-			// textBoxElement
-			// 
-			this->textBoxElement->Location = System::Drawing::Point(353, 240);
-			this->textBoxElement->Name = L"textBoxElement";
-			this->textBoxElement->Size = System::Drawing::Size(409, 31);
-			this->textBoxElement->TabIndex = 13;
+			this->textBoxNameKana->TabIndex = 2;
 			// 
 			// textBoxPASS
 			// 
-			this->textBoxPASS->Location = System::Drawing::Point(353, 195);
+			this->textBoxPASS->Location = System::Drawing::Point(484, 193);
 			this->textBoxPASS->Name = L"textBoxPASS";
 			this->textBoxPASS->Size = System::Drawing::Size(409, 31);
-			this->textBoxPASS->TabIndex = 14;
+			this->textBoxPASS->TabIndex = 5;
 			// 
 			// textBoxUID
 			// 
-			this->textBoxUID->Location = System::Drawing::Point(353, 147);
+			this->textBoxUID->Location = System::Drawing::Point(484, 145);
 			this->textBoxUID->Name = L"textBoxUID";
 			this->textBoxUID->Size = System::Drawing::Size(409, 31);
-			this->textBoxUID->TabIndex = 15;
+			this->textBoxUID->TabIndex = 4;
 			// 
 			// textBoxAdress
 			// 
-			this->textBoxAdress->Location = System::Drawing::Point(353, 98);
+			this->textBoxAdress->Location = System::Drawing::Point(484, 96);
 			this->textBoxAdress->Name = L"textBoxAdress";
 			this->textBoxAdress->Size = System::Drawing::Size(409, 31);
-			this->textBoxAdress->TabIndex = 16;
+			this->textBoxAdress->TabIndex = 3;
 			// 
 			// textBoxName
 			// 
-			this->textBoxName->Location = System::Drawing::Point(353, 12);
+			this->textBoxName->Location = System::Drawing::Point(484, 10);
 			this->textBoxName->Name = L"textBoxName";
 			this->textBoxName->Size = System::Drawing::Size(409, 31);
-			this->textBoxName->TabIndex = 17;
+			this->textBoxName->TabIndex = 1;
 			// 
 			// label1
 			// 
@@ -216,30 +218,127 @@ namespace sdkmifare {
 			this->buttonOK->DialogResult = System::Windows::Forms::DialogResult::OK;
 			this->buttonOK->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonOK->Location = System::Drawing::Point(18, 349);
+			this->buttonOK->Location = System::Drawing::Point(12, 596);
 			this->buttonOK->Name = L"buttonOK";
-			this->buttonOK->Size = System::Drawing::Size(369, 89);
-			this->buttonOK->TabIndex = 32;
+			this->buttonOK->Size = System::Drawing::Size(460, 89);
+			this->buttonOK->TabIndex = 12;
 			this->buttonOK->Text = L"OK";
 			this->buttonOK->UseVisualStyleBackColor = true;
+			this->buttonOK->Click += gcnew System::EventHandler(this, &InputNewUserForm::buttonOK_Click);
 			// 
 			// buttonCancel
 			// 
 			this->buttonCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
 			this->buttonCancel->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonCancel->Location = System::Drawing::Point(393, 349);
+			this->buttonCancel->Location = System::Drawing::Point(485, 596);
 			this->buttonCancel->Name = L"buttonCancel";
-			this->buttonCancel->Size = System::Drawing::Size(369, 89);
-			this->buttonCancel->TabIndex = 33;
+			this->buttonCancel->Size = System::Drawing::Size(408, 89);
+			this->buttonCancel->TabIndex = 13;
 			this->buttonCancel->Text = L"ÉLÉÉÉìÉZÉã";
 			this->buttonCancel->UseVisualStyleBackColor = true;
+			this->buttonCancel->Click += gcnew System::EventHandler(this, &InputNewUserForm::buttonCancel_Click);
+			// 
+			// comboBoxElement
+			// 
+			this->comboBoxElement->FormattingEnabled = true;
+			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ëÆê´1", L"ëÆê´2" });
+			this->comboBoxElement->Location = System::Drawing::Point(484, 238);
+			this->comboBoxElement->Name = L"comboBoxElement";
+			this->comboBoxElement->Size = System::Drawing::Size(409, 32);
+			this->comboBoxElement->TabIndex = 6;
+			// 
+			// comboBoxAdmin
+			// 
+			this->comboBoxAdmin->FormattingEnabled = true;
+			this->comboBoxAdmin->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"å†å¿1", L"å†å¿2" });
+			this->comboBoxAdmin->Location = System::Drawing::Point(484, 286);
+			this->comboBoxAdmin->Name = L"comboBoxAdmin";
+			this->comboBoxAdmin->Size = System::Drawing::Size(409, 32);
+			this->comboBoxAdmin->TabIndex = 7;
+			// 
+			// comboBoxOccupations
+			// 
+			this->comboBoxOccupations->FormattingEnabled = true;
+			this->comboBoxOccupations->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"êEéÌ1", L"êEéÌ2" });
+			this->comboBoxOccupations->Location = System::Drawing::Point(484, 334);
+			this->comboBoxOccupations->Name = L"comboBoxOccupations";
+			this->comboBoxOccupations->Size = System::Drawing::Size(409, 32);
+			this->comboBoxOccupations->TabIndex = 8;
+			// 
+			// comboBoxPosition
+			// 
+			this->comboBoxPosition->FormattingEnabled = true;
+			this->comboBoxPosition->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ñêE1", L"ñêE2" });
+			this->comboBoxPosition->Location = System::Drawing::Point(484, 430);
+			this->comboBoxPosition->Name = L"comboBoxPosition";
+			this->comboBoxPosition->Size = System::Drawing::Size(409, 32);
+			this->comboBoxPosition->TabIndex = 10;
+			// 
+			// comboBoxDepart
+			// 
+			this->comboBoxDepart->FormattingEnabled = true;
+			this->comboBoxDepart->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ïîèê1", L"ïîèê2" });
+			this->comboBoxDepart->Location = System::Drawing::Point(484, 382);
+			this->comboBoxDepart->Name = L"comboBoxDepart";
+			this->comboBoxDepart->Size = System::Drawing::Size(409, 32);
+			this->comboBoxDepart->TabIndex = 9;
+			// 
+			// comboBox6
+			// 
+			this->comboBox6->FormattingEnabled = true;
+			this->comboBox6->Location = System::Drawing::Point(485, 478);
+			this->comboBox6->Name = L"comboBox6";
+			this->comboBox6->Size = System::Drawing::Size(409, 32);
+			this->comboBox6->TabIndex = 11;
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label2->Location = System::Drawing::Point(12, 428);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(79, 33);
+			this->label2->TabIndex = 40;
+			this->label2->Text = L"ñêE";
+			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label3->Location = System::Drawing::Point(12, 380);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(79, 33);
+			this->label3->TabIndex = 41;
+			this->label3->Text = L"ïîèê";
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label4->Location = System::Drawing::Point(12, 332);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(79, 33);
+			this->label4->TabIndex = 42;
+			this->label4->Text = L"êEéÌ";
 			// 
 			// InputNewUserForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(769, 450);
+			this->ClientSize = System::Drawing::Size(905, 697);
+			this->Controls->Add(this->label4);
+			this->Controls->Add(this->label3);
+			this->Controls->Add(this->label2);
+			this->Controls->Add(this->comboBox6);
+			this->Controls->Add(this->comboBoxDepart);
+			this->Controls->Add(this->comboBoxPosition);
+			this->Controls->Add(this->comboBoxOccupations);
+			this->Controls->Add(this->comboBoxAdmin);
+			this->Controls->Add(this->comboBoxElement);
 			this->Controls->Add(this->buttonCancel);
 			this->Controls->Add(this->buttonOK);
 			this->Controls->Add(this->label14);
@@ -253,8 +352,6 @@ namespace sdkmifare {
 			this->Controls->Add(this->textBoxAdress);
 			this->Controls->Add(this->textBoxUID);
 			this->Controls->Add(this->textBoxPASS);
-			this->Controls->Add(this->textBoxElement);
-			this->Controls->Add(this->textBoxAdm);
 			this->Controls->Add(this->textBoxNameKana);
 			this->Name = L"InputNewUserForm";
 			this->Text = L"InputNewUserForm";
@@ -264,21 +361,40 @@ namespace sdkmifare {
 
 		}
 #pragma endregion
+		public:String^ UID = "";
 	/*äTóv:êVãKçÏê¨âÊñ Çï¬Ç∂ÇÈÇ∆Ç´ÇÃÉCÉxÉìÉg
 	çÏê¨ì˙:2017.10.10
 	çÏê¨é“:K.Asada*/
 	private: System::Void InputNewUserForm_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
 //		std::string filename = "";    //ÉtÉ@ÉCÉãñºÇäiî[Ç∑ÇÈÇΩÇﬂÇÃï∂éöóÒ
-	//	std::string setdata = "";     //ÉeÉLÉXÉgÇ…äiî[Ç∑ÇÈÇΩÇﬂÇÃï∂éöóÒ
-		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text);
-		writer->WriteLine(this->textBoxName->Text);
-		writer->WriteLine(this->textBoxNameKana->Text);
-		writer->WriteLine(this->textBoxPASS->Text);
-		writer->WriteLine(this->textBoxElement->Text);
-		writer->WriteLine(this->textBoxAdm->Text);
-		writer->WriteLine(this->textBoxAdress->Text);
-		writer->Close();
-		return;
+	//	std::string setdata = "";     //ÉeÉLÉXÉgÇ…äiî[Ç∑ÇÈÇΩÇﬂÇÃï∂éö
 	}
+private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
+	System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text);
+	writer->Write(this->SetByte(this->textBoxName->Text, 16));
+	writer->Write(this->SetByte(this->textBoxNameKana->Text, 16));
+	writer->Write(this->SetByte(this->textBoxUID->Text, 8));
+	writer->Write(this->SetByte(this->textBoxPASS->Text, 8));
+	writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 80));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxElement->SelectedIndex, 2), 4 * 8));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxAdmin->SelectedIndex, 2), 4 * 8));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxOccupations->SelectedIndex, 2), 4 * 8));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxDepart->SelectedIndex, 2), 3 * 8));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxPosition->SelectedIndex, 2), 1 * 8));
+	writer->Close();
+	this->Close();
+}
+
+private:System::String^ SetByte(String^ data, Int32 setbyte) {
+	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");
+	Int32 bytecount = e->GetByteCount(data);
+	for (; bytecount < setbyte; bytecount++) {
+		data += " ";
+	}
+	return data;
+}
+private: System::Void buttonCancel_Click(System::Object^  sender, System::EventArgs^  e) {
+	this->Close();
+}
 };
 }
