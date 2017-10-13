@@ -80,8 +80,8 @@ static const LPTSTR PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
 	static const SENDCOMM AUTHENTICATE = { 10,{ 0xFF,0x86,0x00,0x00,0x05,0x01,0x00,BEGIN_BLOCK,0x60,0x00 } };
 	//データ受信コマンド、カードのデータを受信する際に使用(詳細はリファレンス参照)
 	//ReadBinary
-	static const SENDCOMM READCARD = { 5,{ 0xFF,0xB0,0x00,(unsigned char)BEGIN_BLOCK,0x00 } };
+	static const SENDCOMM READCARD = { 5,{ 0xFF,0xB0,0x00,BEGIN_BLOCK,0x00 } };
 	//データ送信コマンド、カードにデータを送信する際に使用(詳細はリファレンス参照)
 	//UpdateBinary
-	static const SENDCOMM SENDCARD = { 21,{ 0xFF,0xD6,0x00,(unsigned char)BEGIN_BLOCK,0x10 } };
+	static const SENDCOMM SENDCARD = { 21,{ 0xFF,0xD6,0x00,BEGIN_BLOCK,0x10 } };
 }

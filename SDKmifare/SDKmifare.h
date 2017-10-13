@@ -193,27 +193,18 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem* adm;    //カードとの接続を行ったりするクラスをインスタンス化
-	ConnectCard* con;
-	//カード待ち状態にしたうえで、リソースマネージャへのアドレスをメンバへ格納する
-	this->hContext = con->WaitingCard();
-	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
-	if (MessageBox::Show("カードをかざしてください。") == System::Windows::Forms::DialogResult::Cancel) {
-		//操作が中断された旨を表示する
-		MessageBox::Show("操作が中断されました。");
-		//接続を終了する関数を呼び出す
-		con->EndConnect(this->hContext, this->hCard);
-	}//カードがかざされたらデータの取得に移る
-	else if (this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)) {
-	//	PassForm^ pass = gcnew PassForm();
-	//	pass->ShowDialog();
-	//	std::string passtring;
-	//	MarshalString(pass->textBox1->Text, passtring);
-		//カードからデータを取得する関数を呼び出す
-		*this->Uid = adm->GetCardData(this->hContext, this->hCard, "aaa", this->ActivProtocol);
-		//取得したデータから画面に表示する文字列を作成する
-		this->CreateDisp();
-	}
+	AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
+	PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
+	std::string passtring = "";                      //パスワードを格納するための文字列
+	//メッセージを表示する
+	MessageBox::Show("カードをかざしてください");
+	//パスワード入力画面に移行する
+	pass->ShowDialog();
+	//受け取ったパスを変換するStringからstringへ
+	this->MarshalString(pass->textBox1->Text, passtring);
+	//カードデータを受信する関数を呼び出す
+	adm->GetCardData(passtring);
+	this->CreateDisp();
 	return;
 }
 

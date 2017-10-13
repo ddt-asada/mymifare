@@ -107,7 +107,8 @@ public:
 		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		SCARDHANDLE card = NULL;
-	//	DWORD ActiveProtocol = 0; //プロトコル
+		SCARDCONTEXT hContext = EstablishContext();
+		DWORD ActiveProtocol = 0; //プロトコル
 		LPTSTR ReaderName = NULL;                      //取得したリーダの名前を格納するための文字列
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
 													  //	LONG lResult;                                 //名前を正しく取得できたかの判定を格納するための文字列
@@ -141,7 +142,7 @@ public:
 			//		EndConnect(hContext, *hCard);
 		}
 		unsigned char RecvBuf[PCSC_RECV_BUFF_LEN] = { '\0' };
-		unsigned char* RetBuf[16] = { '\0' };
+		std::vector<std::vector<unsigned char>> RetBuf = { {'\0'} };
 		unsigned long ResponseSize = 0;
 		//unsigned long lResult;
 		//全てのコマンドを送信するまで繰り返す
@@ -155,7 +156,7 @@ public:
 				//例外を投げる
 				throw gcnew System::Exception("Error");
 				//リーダーとの通信、カードとの通信を終了する
-				EndConnect(hContext, hCard);
+				EndConnect(hContext, card);
 			}
 			for (UINT uiRespIdx = 0; uiRespIdx < ResponseSize; uiRespIdx++) {
 				_ftprintf_s(stdout, _T("%02X"), RecvBuf[uiRespIdx]);
@@ -169,7 +170,7 @@ public:
 			//受け取ったすべてのレスポンスを格納する（後ろ2文字は送信正否の判定なので格納しないのため）
 /*			for (int j = 0; j < ResponseSize - 2; j++) {
 				//受け取ったレスポンスを返却用の文字列に格納する
-				RetBuf[i][j] = RecvBuf[j];
+				RetBuf[i].push_back(RecvBuf[j]);
 			}
 			_ftprintf_s(stdout, _T("%02X"), RecvBuf[ResponseSize -2]);
 			_ftprintf_s(stdout, _T("%02X"), RecvBuf[ResponseSize - 1]);*/

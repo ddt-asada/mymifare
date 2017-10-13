@@ -175,7 +175,7 @@ public:
 		//送信コマンドを作成する関数を呼び出す
 		ReadySetData(uid, senddata);
 		//カードへコマンドを送信する関数を呼び出す
-		con->Transmit(hContext, hCard, senddata, 0);
+		con->Transmit(senddata);
 		//接続を終了する関数を呼び出す
 		con->EndConnect(hContext, hCard);
 		return;
