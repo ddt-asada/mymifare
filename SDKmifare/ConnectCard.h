@@ -268,4 +268,10 @@ public:
 		::SCardReleaseContext(hContext);
 		return;
 	}
+
+	/*概要:リーダーとの通信の入り口となる関数
+	引数:std::vector<SENDCOMM> sendcomm:リーダーへ送信するコマンド
+	戻り値:std::vector<std::vector<unsigned char>> recvdata:カードから受信したデータ
+	作成日:2017.10.16
+	作成者:K.Asada*/
 };

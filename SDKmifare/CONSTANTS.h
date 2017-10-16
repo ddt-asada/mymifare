@@ -14,6 +14,11 @@ namespace CONSTANTGROUP {
 			unsigned char sendCommand[PCSC_TRANS_BUFF_LEN];
 		} SENDCOMM;
 
+		union ITOC {
+			unsigned short int num;
+			char bytes[sizeof(unsigned short int)];
+		};
+
 		//書き込みの始点となるブロック
 		static const int BEGIN_BLOCK = 8;
 
@@ -22,18 +27,18 @@ namespace CONSTANTGROUP {
 		static const int END_BLOCK = 26;
 		//書き込むブロックの数
 		static const int BLOCK_COUNT = END_BLOCK - BEGIN_BLOCK;
-		//キー認証コマンド、コマンド送信時の最初に行わなければならない(詳細はリファレンス参照)
-		//Load Key Mifare Default Key(FFFFFFFFFFFF)
-	//	static const SENDCOMM LOADKEY;
-		//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
-		// General Authenticate
-	//	static const SENDCOMM AUTHENTICATE;
-		//データ受信コマンド、カードのデータを受信する際に使用(詳細はリファレンス参照)
-		//ReadBinary
-	//	static const SENDCOMM READCARD;
-		//データ送信コマンド、カードにデータを送信する際に使用(詳細はリファレンス参照)
-	//	//UpdateBinary
-	//	static const SENDCOMM SENDCARD;
+		//新規作成時に表示されるメッセージ
+		System::String NEW_MESSAGE = gcnew System::String("新規で作成します。\n情報を入力してください。");
+		//カードをかざす指示のメッセージ
+		static System::String SET_CARD_MESSAGE = ("カードをかざしてください");
+		//作成完了時のメッセージ
+		System::String FINISH_MESSAGE = "カードが作成されました";
+		//操作キャンセル時のメッセージ
+		System::String CANCEL_MESSAGE = "操作が中断されました。";
+		//退館時のメッセージ
+		System::String LEAVE_MESSAGE = "退館しました。";
+		//入館時のメッセージ
+		System::String ENTER_MESSAGE = "入館しました。";
 		//ユーザー名が格納されているブロック番号
 		static const int NAME_INDEX = 0;
 		//ユーザーフリガナが格納されているブロック番号
@@ -84,4 +89,6 @@ static const LPTSTR PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
 	//データ送信コマンド、カードにデータを送信する際に使用(詳細はリファレンス参照)
 	//UpdateBinary
 	static const SENDCOMM SENDCARD = { 21,{ 0xFF,0xD6,0x00,BEGIN_BLOCK,0x10 } };
+	//送信コマンドの終わりをしめすコマンド
+	static const SENDCOMM ENDCOMMAND = { -1, NULL };
 }

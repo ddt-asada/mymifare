@@ -62,6 +62,19 @@ namespace sdkmifare {
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
 	private: System::Windows::Forms::Label^  label4;
+	private: System::Windows::Forms::Label^  labelBirthDay;
+	private: System::Windows::Forms::Label^  label6;
+	private: System::Windows::Forms::TextBox^  textBoxTELL1;
+	private: System::Windows::Forms::TextBox^  textBoxTELL2;
+	private: System::Windows::Forms::TextBox^  textBoxTELL3;
+	private: System::Windows::Forms::Label^  label5;
+	private: System::Windows::Forms::Label^  label7;
+	private: System::Windows::Forms::Label^  label8;
+	private: System::Windows::Forms::Label^  label15;
+	private: System::Windows::Forms::TextBox^  textBoxBirthDay;
+	private: System::Windows::Forms::TextBox^  textBoxBirthMonth;
+	private: System::Windows::Forms::TextBox^  textBoxBirthYear;
+	private: System::Windows::Forms::Label^  label16;
 
 	private:
 		/// <summary>
@@ -99,39 +112,52 @@ namespace sdkmifare {
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label4 = (gcnew System::Windows::Forms::Label());
+			this->labelBirthDay = (gcnew System::Windows::Forms::Label());
+			this->label6 = (gcnew System::Windows::Forms::Label());
+			this->textBoxTELL1 = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxTELL2 = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxTELL3 = (gcnew System::Windows::Forms::TextBox());
+			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->label7 = (gcnew System::Windows::Forms::Label());
+			this->label8 = (gcnew System::Windows::Forms::Label());
+			this->label15 = (gcnew System::Windows::Forms::Label());
+			this->textBoxBirthDay = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxBirthMonth = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxBirthYear = (gcnew System::Windows::Forms::TextBox());
+			this->label16 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// textBoxNameKana
 			// 
-			this->textBoxNameKana->Location = System::Drawing::Point(484, 54);
+			this->textBoxNameKana->Location = System::Drawing::Point(485, 56);
 			this->textBoxNameKana->Name = L"textBoxNameKana";
 			this->textBoxNameKana->Size = System::Drawing::Size(409, 31);
 			this->textBoxNameKana->TabIndex = 2;
 			// 
 			// textBoxPASS
 			// 
-			this->textBoxPASS->Location = System::Drawing::Point(484, 193);
+			this->textBoxPASS->Location = System::Drawing::Point(479, 287);
 			this->textBoxPASS->Name = L"textBoxPASS";
 			this->textBoxPASS->Size = System::Drawing::Size(409, 31);
 			this->textBoxPASS->TabIndex = 5;
 			// 
 			// textBoxUID
 			// 
-			this->textBoxUID->Location = System::Drawing::Point(484, 145);
+			this->textBoxUID->Location = System::Drawing::Point(479, 239);
 			this->textBoxUID->Name = L"textBoxUID";
 			this->textBoxUID->Size = System::Drawing::Size(409, 31);
 			this->textBoxUID->TabIndex = 4;
 			// 
 			// textBoxAdress
 			// 
-			this->textBoxAdress->Location = System::Drawing::Point(484, 96);
+			this->textBoxAdress->Location = System::Drawing::Point(485, 98);
 			this->textBoxAdress->Name = L"textBoxAdress";
 			this->textBoxAdress->Size = System::Drawing::Size(409, 31);
 			this->textBoxAdress->TabIndex = 3;
 			// 
 			// textBoxName
 			// 
-			this->textBoxName->Location = System::Drawing::Point(484, 10);
+			this->textBoxName->Location = System::Drawing::Point(485, 12);
 			this->textBoxName->Name = L"textBoxName";
 			this->textBoxName->Size = System::Drawing::Size(409, 31);
 			this->textBoxName->TabIndex = 1;
@@ -141,7 +167,7 @@ namespace sdkmifare {
 			this->label1->AutoSize = true;
 			this->label1->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label1->Location = System::Drawing::Point(12, 9);
+			this->label1->Location = System::Drawing::Point(13, 11);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(271, 33);
 			this->label1->TabIndex = 18;
@@ -152,7 +178,7 @@ namespace sdkmifare {
 			this->label9->AutoSize = true;
 			this->label9->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label9->Location = System::Drawing::Point(12, 284);
+			this->label9->Location = System::Drawing::Point(7, 375);
 			this->label9->Name = L"label9";
 			this->label9->Size = System::Drawing::Size(79, 33);
 			this->label9->TabIndex = 26;
@@ -163,7 +189,7 @@ namespace sdkmifare {
 			this->label10->AutoSize = true;
 			this->label10->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label10->Location = System::Drawing::Point(12, 236);
+			this->label10->Location = System::Drawing::Point(7, 327);
 			this->label10->Name = L"label10";
 			this->label10->Size = System::Drawing::Size(79, 33);
 			this->label10->TabIndex = 27;
@@ -174,7 +200,7 @@ namespace sdkmifare {
 			this->label11->AutoSize = true;
 			this->label11->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label11->Location = System::Drawing::Point(12, 191);
+			this->label11->Location = System::Drawing::Point(7, 285);
 			this->label11->Name = L"label11";
 			this->label11->Size = System::Drawing::Size(175, 33);
 			this->label11->TabIndex = 28;
@@ -185,7 +211,7 @@ namespace sdkmifare {
 			this->label12->AutoSize = true;
 			this->label12->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label12->Location = System::Drawing::Point(12, 143);
+			this->label12->Location = System::Drawing::Point(7, 237);
 			this->label12->Name = L"label12";
 			this->label12->Size = System::Drawing::Size(175, 33);
 			this->label12->TabIndex = 29;
@@ -196,18 +222,18 @@ namespace sdkmifare {
 			this->label13->AutoSize = true;
 			this->label13->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label13->Location = System::Drawing::Point(12, 94);
+			this->label13->Location = System::Drawing::Point(13, 96);
 			this->label13->Name = L"label13";
-			this->label13->Size = System::Drawing::Size(271, 33);
+			this->label13->Size = System::Drawing::Size(79, 33);
 			this->label13->TabIndex = 30;
-			this->label13->Text = L"èZèäÅiîºäpÉJÉiÅj";
+			this->label13->Text = L"èZèä";
 			// 
 			// label14
 			// 
 			this->label14->AutoSize = true;
 			this->label14->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label14->Location = System::Drawing::Point(12, 52);
+			this->label14->Location = System::Drawing::Point(13, 54);
 			this->label14->Name = L"label14";
 			this->label14->Size = System::Drawing::Size(335, 33);
 			this->label14->TabIndex = 31;
@@ -218,7 +244,7 @@ namespace sdkmifare {
 			this->buttonOK->DialogResult = System::Windows::Forms::DialogResult::OK;
 			this->buttonOK->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonOK->Location = System::Drawing::Point(12, 596);
+			this->buttonOK->Location = System::Drawing::Point(13, 610);
 			this->buttonOK->Name = L"buttonOK";
 			this->buttonOK->Size = System::Drawing::Size(460, 89);
 			this->buttonOK->TabIndex = 12;
@@ -231,9 +257,9 @@ namespace sdkmifare {
 			this->buttonCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
 			this->buttonCancel->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonCancel->Location = System::Drawing::Point(485, 596);
+			this->buttonCancel->Location = System::Drawing::Point(479, 610);
 			this->buttonCancel->Name = L"buttonCancel";
-			this->buttonCancel->Size = System::Drawing::Size(408, 89);
+			this->buttonCancel->Size = System::Drawing::Size(416, 89);
 			this->buttonCancel->TabIndex = 13;
 			this->buttonCancel->Text = L"ÉLÉÉÉìÉZÉã";
 			this->buttonCancel->UseVisualStyleBackColor = true;
@@ -243,7 +269,7 @@ namespace sdkmifare {
 			// 
 			this->comboBoxElement->FormattingEnabled = true;
 			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ëÆê´1", L"ëÆê´2" });
-			this->comboBoxElement->Location = System::Drawing::Point(484, 238);
+			this->comboBoxElement->Location = System::Drawing::Point(479, 329);
 			this->comboBoxElement->Name = L"comboBoxElement";
 			this->comboBoxElement->Size = System::Drawing::Size(409, 32);
 			this->comboBoxElement->TabIndex = 6;
@@ -252,7 +278,7 @@ namespace sdkmifare {
 			// 
 			this->comboBoxAdmin->FormattingEnabled = true;
 			this->comboBoxAdmin->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"å†å¿1", L"å†å¿2" });
-			this->comboBoxAdmin->Location = System::Drawing::Point(484, 286);
+			this->comboBoxAdmin->Location = System::Drawing::Point(479, 377);
 			this->comboBoxAdmin->Name = L"comboBoxAdmin";
 			this->comboBoxAdmin->Size = System::Drawing::Size(409, 32);
 			this->comboBoxAdmin->TabIndex = 7;
@@ -261,7 +287,7 @@ namespace sdkmifare {
 			// 
 			this->comboBoxOccupations->FormattingEnabled = true;
 			this->comboBoxOccupations->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"êEéÌ1", L"êEéÌ2" });
-			this->comboBoxOccupations->Location = System::Drawing::Point(484, 334);
+			this->comboBoxOccupations->Location = System::Drawing::Point(479, 425);
 			this->comboBoxOccupations->Name = L"comboBoxOccupations";
 			this->comboBoxOccupations->Size = System::Drawing::Size(409, 32);
 			this->comboBoxOccupations->TabIndex = 8;
@@ -270,7 +296,7 @@ namespace sdkmifare {
 			// 
 			this->comboBoxPosition->FormattingEnabled = true;
 			this->comboBoxPosition->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ñêE1", L"ñêE2" });
-			this->comboBoxPosition->Location = System::Drawing::Point(484, 430);
+			this->comboBoxPosition->Location = System::Drawing::Point(479, 521);
 			this->comboBoxPosition->Name = L"comboBoxPosition";
 			this->comboBoxPosition->Size = System::Drawing::Size(409, 32);
 			this->comboBoxPosition->TabIndex = 10;
@@ -279,7 +305,7 @@ namespace sdkmifare {
 			// 
 			this->comboBoxDepart->FormattingEnabled = true;
 			this->comboBoxDepart->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"ïîèê1", L"ïîèê2" });
-			this->comboBoxDepart->Location = System::Drawing::Point(484, 382);
+			this->comboBoxDepart->Location = System::Drawing::Point(479, 473);
 			this->comboBoxDepart->Name = L"comboBoxDepart";
 			this->comboBoxDepart->Size = System::Drawing::Size(409, 32);
 			this->comboBoxDepart->TabIndex = 9;
@@ -287,7 +313,7 @@ namespace sdkmifare {
 			// comboBox6
 			// 
 			this->comboBox6->FormattingEnabled = true;
-			this->comboBox6->Location = System::Drawing::Point(485, 478);
+			this->comboBox6->Location = System::Drawing::Point(480, 569);
 			this->comboBox6->Name = L"comboBox6";
 			this->comboBox6->Size = System::Drawing::Size(409, 32);
 			this->comboBox6->TabIndex = 11;
@@ -297,7 +323,7 @@ namespace sdkmifare {
 			this->label2->AutoSize = true;
 			this->label2->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label2->Location = System::Drawing::Point(12, 428);
+			this->label2->Location = System::Drawing::Point(7, 519);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(79, 33);
 			this->label2->TabIndex = 40;
@@ -308,7 +334,7 @@ namespace sdkmifare {
 			this->label3->AutoSize = true;
 			this->label3->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label3->Location = System::Drawing::Point(12, 380);
+			this->label3->Location = System::Drawing::Point(7, 471);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(79, 33);
 			this->label3->TabIndex = 41;
@@ -319,17 +345,149 @@ namespace sdkmifare {
 			this->label4->AutoSize = true;
 			this->label4->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label4->Location = System::Drawing::Point(12, 332);
+			this->label4->Location = System::Drawing::Point(7, 423);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(79, 33);
 			this->label4->TabIndex = 42;
 			this->label4->Text = L"êEéÌ";
 			// 
+			// labelBirthDay
+			// 
+			this->labelBirthDay->AutoSize = true;
+			this->labelBirthDay->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->labelBirthDay->Location = System::Drawing::Point(13, 144);
+			this->labelBirthDay->Name = L"labelBirthDay";
+			this->labelBirthDay->Size = System::Drawing::Size(143, 33);
+			this->labelBirthDay->TabIndex = 43;
+			this->labelBirthDay->Text = L"ê∂îNåéì˙";
+			// 
+			// label6
+			// 
+			this->label6->AutoSize = true;
+			this->label6->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label6->Location = System::Drawing::Point(13, 190);
+			this->label6->Name = L"label6";
+			this->label6->Size = System::Drawing::Size(79, 33);
+			this->label6->TabIndex = 44;
+			this->label6->Text = L"TELL";
+			// 
+			// textBoxTELL1
+			// 
+			this->textBoxTELL1->Location = System::Drawing::Point(479, 194);
+			this->textBoxTELL1->Name = L"textBoxTELL1";
+			this->textBoxTELL1->Size = System::Drawing::Size(84, 31);
+			this->textBoxTELL1->TabIndex = 45;
+			// 
+			// textBoxTELL2
+			// 
+			this->textBoxTELL2->Location = System::Drawing::Point(606, 194);
+			this->textBoxTELL2->Name = L"textBoxTELL2";
+			this->textBoxTELL2->Size = System::Drawing::Size(120, 31);
+			this->textBoxTELL2->TabIndex = 46;
+			// 
+			// textBoxTELL3
+			// 
+			this->textBoxTELL3->Location = System::Drawing::Point(769, 194);
+			this->textBoxTELL3->Name = L"textBoxTELL3";
+			this->textBoxTELL3->Size = System::Drawing::Size(118, 31);
+			this->textBoxTELL3->TabIndex = 47;
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label5->Location = System::Drawing::Point(732, 194);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(31, 33);
+			this->label5->TabIndex = 48;
+			this->label5->Text = L"-";
+			// 
+			// label7
+			// 
+			this->label7->AutoSize = true;
+			this->label7->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label7->Location = System::Drawing::Point(569, 194);
+			this->label7->Name = L"label7";
+			this->label7->Size = System::Drawing::Size(31, 33);
+			this->label7->TabIndex = 49;
+			this->label7->Text = L"-";
+			// 
+			// label8
+			// 
+			this->label8->AutoSize = true;
+			this->label8->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label8->Location = System::Drawing::Point(606, 148);
+			this->label8->Name = L"label8";
+			this->label8->Size = System::Drawing::Size(47, 33);
+			this->label8->TabIndex = 54;
+			this->label8->Text = L"îN";
+			// 
+			// label15
+			// 
+			this->label15->AutoSize = true;
+			this->label15->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label15->Location = System::Drawing::Point(732, 148);
+			this->label15->Name = L"label15";
+			this->label15->Size = System::Drawing::Size(47, 33);
+			this->label15->TabIndex = 53;
+			this->label15->Text = L"åé";
+			// 
+			// textBoxBirthDay
+			// 
+			this->textBoxBirthDay->Location = System::Drawing::Point(785, 152);
+			this->textBoxBirthDay->Name = L"textBoxBirthDay";
+			this->textBoxBirthDay->Size = System::Drawing::Size(62, 31);
+			this->textBoxBirthDay->TabIndex = 52;
+			// 
+			// textBoxBirthMonth
+			// 
+			this->textBoxBirthMonth->Location = System::Drawing::Point(659, 150);
+			this->textBoxBirthMonth->Name = L"textBoxBirthMonth";
+			this->textBoxBirthMonth->Size = System::Drawing::Size(67, 31);
+			this->textBoxBirthMonth->TabIndex = 51;
+			// 
+			// textBoxBirthYear
+			// 
+			this->textBoxBirthYear->Location = System::Drawing::Point(485, 148);
+			this->textBoxBirthYear->Name = L"textBoxBirthYear";
+			this->textBoxBirthYear->Size = System::Drawing::Size(115, 31);
+			this->textBoxBirthYear->TabIndex = 50;
+			// 
+			// label16
+			// 
+			this->label16->AutoSize = true;
+			this->label16->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label16->Location = System::Drawing::Point(853, 150);
+			this->label16->Name = L"label16";
+			this->label16->Size = System::Drawing::Size(47, 33);
+			this->label16->TabIndex = 55;
+			this->label16->Text = L"ì˙";
+			// 
 			// InputNewUserForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(905, 697);
+			this->ClientSize = System::Drawing::Size(904, 710);
+			this->Controls->Add(this->label16);
+			this->Controls->Add(this->label8);
+			this->Controls->Add(this->label15);
+			this->Controls->Add(this->textBoxBirthDay);
+			this->Controls->Add(this->textBoxBirthMonth);
+			this->Controls->Add(this->textBoxBirthYear);
+			this->Controls->Add(this->label7);
+			this->Controls->Add(this->label5);
+			this->Controls->Add(this->textBoxTELL3);
+			this->Controls->Add(this->textBoxTELL2);
+			this->Controls->Add(this->textBoxTELL1);
+			this->Controls->Add(this->label6);
+			this->Controls->Add(this->labelBirthDay);
 			this->Controls->Add(this->label4);
 			this->Controls->Add(this->label3);
 			this->Controls->Add(this->label2);
@@ -375,6 +533,8 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	writer->Write(this->SetByte(this->textBoxNameKana->Text, 16));
 	writer->Write(this->SetByte(this->textBoxUID->Text, 8));
 	writer->Write(this->SetByte(this->textBoxPASS->Text, 8));
+	writer->Write(this->SetByte(this->textBoxBirthYear->Text + "îN" + this->textBoxBirthMonth->Text + "åé" + this->textBoxBirthDay->Text + "ì˙", 16));
+	writer->Write(this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
 	writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 80));
 	writer->Write(this->SetByte(Convert::ToString(this->comboBoxElement->SelectedIndex, 2), 4 * 8));
 	writer->Write(this->SetByte(Convert::ToString(this->comboBoxAdmin->SelectedIndex, 2), 4 * 8));
@@ -388,8 +548,13 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 private:System::String^ SetByte(String^ data, Int32 setbyte) {
 	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");
 	Int32 bytecount = e->GetByteCount(data);
-	for (; bytecount < setbyte; bytecount++) {
-		data += " ";
+	if (bytecount <= setbyte) {
+		for (; bytecount < setbyte; bytecount++) {
+			data += " ";
+		}
+	}
+	else {
+		throw gcnew System::Exception(OVER_ERROR_MESSAGE);
 	}
 	return data;
 }

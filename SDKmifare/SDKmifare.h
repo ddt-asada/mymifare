@@ -149,25 +149,22 @@ private:SCARDCONTEXT hContext = 0;		//読み込んだリソースマネージャへのポインタ
 作成者:K.Asada*/
 private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventArgs^  e) {
 	InputNewUserForm^ create = gcnew InputNewUserForm();    //新規ユーザー情報を入力するためのクラスをインスタンス化
-	AdmissionSystem* adm;
-	ConnectCard* con;
+	AdmissionSystem* adm = new AdmissionSystem();           //入館管理システム関連のクラスをインスタンス化
 	//新規で作成する旨を伝える
-	MessageBox::Show("新規で作成します。\n情報を入力してください。");
+	MessageBox::Show(NEW_MESSAGE);
 	//作成画面でOKが押されたらそのまま作成する
 	if (create->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 		std::string id;
 		this->MarshalString(create->UID, id);
-		//カード待ち状態にする
-	//	this->hContext = con->WaitingCard();
 		//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
-		MessageBox::Show("カードをかざしてください。");
-		//カードがかざされたらデータの取得に移る
-		//this->ActivProtocol = con->CardConnect(this->hContext, this->hCard)
+		MessageBox::Show(SET_CARD_MESSAGE);
 		//カードからデータを取得する関数を呼び出す
-		adm->SetCardData(this->hContext, this->hCard, id);
+		adm->SetCardData(id);
+		//作成完了のメッセージを表示する
+		MessageBox::Show(FINISH_MESSAGE);
 	}//OK以外の時は作成が中断されたとする
 	else {
-		MessageBox::Show("操作が中断されました。");
+		MessageBox::Show(CANCEL_MESSAGE);
 	}
 	return;
 }
@@ -176,15 +173,15 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 作成日：2017.10.10
 作成者：K.Asada*/
 private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem* adm;    //カードとの接続を行ったりするクラスをインスタンス化
+	AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
 	//退館日を記録する
 	adm->SetAdmissionTimes(*this->Uid);
 	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
-	MessageBox::Show("カードをかざしてください。");
-	//カードがかざされたらデータの取得に移る
+	MessageBox::Show(SET_CARD_MESSAGE);
 	//カードからデータを取得する関数を呼び出す
-	adm->SetCardData(this->hContext, this->hCard, *this->Uid);
-	MessageBox::Show("退館しました。");
+	adm->SetCardData(*this->Uid);
+	//退館時のメッセージを表示する
+	MessageBox::Show(LEAVE_MESSAGE);
 	return;
 }
 
@@ -197,7 +194,7 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 	PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
 	std::string passtring = "";                      //パスワードを格納するための文字列
 	//メッセージを表示する
-	MessageBox::Show("カードをかざしてください");
+	MessageBox::Show(SET_CARD_MESSAGE);
 	//パスワード入力画面に移行する
 	pass->ShowDialog();
 	//受け取ったパスを変換するStringからstringへ
@@ -205,6 +202,8 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 	//カードデータを受信する関数を呼び出す
 	adm->GetCardData(passtring);
 	this->CreateDisp();
+	//入館完了のメッセージを表示する
+	MessageBox::Show(ENTER_MESSAGE);
 	return;
 }
 

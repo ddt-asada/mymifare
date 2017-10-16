@@ -11,6 +11,8 @@
 #include "ConnectCard.h"
 #include "CONSTANTS.h"
 
+using namespace CONSTANTGROUP;
+
 public class AdmissionSystem {
 public:
 	AdmissionSystem() {
@@ -25,18 +27,16 @@ public:
 		std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
 		uid = GetData(data, ID_INDEX);
+		//取得したユーザー名でファイルを開く
+		std::ifstream ifs(uid);
 		//ユーザーIDをファイル名としたファイルが開けないときはユーザーが存在していないとして例外を投げる
-		if (!ifstream file(uid)) {
+		if (!ifs) {
 			//対象のユーザーが存在していない旨を例外として投げる
 			throw gcnew System::Exception("対象のIDが存在していません");
 		}//それ以外の時はパスワードの判定に移る
 		else {
-			//ユーザー名のブロックを指定してユーザー名を取得する
-			name = GetData(data, NAME_INDEX);
-			//パスワードのブロックを指定してパスワードを取得する
-			pass = GetData(data, PASS_INDEX);
 			//パスワードの判定に移る
-			CheckPass(name, pass, file);
+			CheckPass(data, pass);
 		}
 		//判定が終わったらユーザーIDを返却する
 		return uid;
@@ -49,25 +49,17 @@ public:
 	戻り値:bool:照合結果の正否
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	bool CheckPass(std::string name, std::string pass) {
-		/*std::string getname = "";        //ファイルより取得した名前を格納するための文字列
+	bool CheckPass(std::vector<std::vector<unsigned char>> data, std::string pass) {
 		std::string getpass = "";        //ファイルより取得したパスを格納するための文字列
-		//ストリームより名前を取得する
-		file >> getname;
-		//ストリームよりパスを取得する
-		file >> getpass;
-		//名前が違ったら例外を投げる
-		if (getname != name) {
-			//名前が違う旨の例外を投げる
-			throw gcnew System::Exception("ユーザー名が不正です。");
-		}
+		//受信したカードデータより情報を取得する関数を呼び出す
+		getpass = GetData(data, PASS_INDEX);
 		//パスが違ったら例外を投げる
 		if (getpass != pass) {
 			//パスが違う旨の例外を投げる
 			throw gcnew System::Exception("パスワードが不正です。");
 		}
 		//ここまで来たら成功したとしてtrueを返却
-		return true;*/
+		return true;
 	}
 
 	/*概要：カードより取得したunsigned charより文字列を取得するための関数
@@ -76,7 +68,7 @@ public:
 	戻り値:string datastring:取得した文字列
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	std::string GetData(unsigned char data, int index) {
+	std::string GetData(std::vector<std::vector<unsigned char>> data, int index) {
 /*		std::string datastring = "";    //取得した文字列を格納するための文字列
 		//対象のブロックからすべての文字列を取得するまで繰り返す
 		for (int i = 0; i < data[index].length, i++) {
@@ -169,15 +161,15 @@ public:
 	戻り値:なし
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	void SetCardData(SCARDCONTEXT hContext, SCARDHANDLE hCard, std::string uid) {
+	void SetCardData(std::string uid) {
 		ConnectCard* con = new ConnectCard();    //カード通信クラスをインスタンス化
-		CONSTANTGROUP::SENDCOMM senddata[22];    //送信コマンドを格納するための構造体
+		std::vector<SENDCOMM> senddata;    //送信コマンドを格納するための構造体
 		//送信コマンドを作成する関数を呼び出す
-		ReadySetData(uid, senddata);
+		senddata = ReadySetData(uid);
+		//送信コマンドの終わりにコマンドの終わりを示すコマンドを格納する
+		senddata.push_back(ENDCOMMAND);
 		//カードへコマンドを送信する関数を呼び出す
 		con->Transmit(senddata);
-		//接続を終了する関数を呼び出す
-		con->EndConnect(hContext, hCard);
 		return;
 	}
 
@@ -188,41 +180,38 @@ public:
 	作成日:2017.10.10
 	作成者:K.Asada*/
 	std::string GetCardData(std::string pass) {
-		std::vector<CONSTANTGROUP::SENDCOMM>sendcomm;        //受信コマンドを格納するための配列
-		std::vector<std::vector<unsigned char>> recvdata = { {'\0'} };    //受信データを格納するための配列
+		std::vector<SENDCOMM>sendcomm;        //受信コマンドを格納するための配列
+		std::vector<SENDCOMM>copycomm;
+		std::vector<std::vector<unsigned char>> recvdata;    //受信データを格納するための配列
 		std::string uid;
 		ConnectCard* con = new ConnectCard();                //カードとの通信を行うクラスをインスタンス化
 		//受信コマンドを組み立てる関数を呼び出す
-		sendcomm = ReadyGetData();
+		sendcomm = ReadyGetData(BEGIN_BLOCK);
 		//受信コマンドをカードへ送信してデータを受け取る
 		recvdata = con->Transmit(sendcomm);
 		//ユーザー情報を確認する関数を呼び出す
-		CheckUser(recvdata, pass);
+		uid = CheckUser(recvdata, pass);
 		//入館時間を取得する関数を呼び出す
 		SetAdmissionTimes(uid);
 		//入館時間をカードに記録させる
-		sendcomm = ReadySetTimes(uid);
+		copycomm = ReadySetTimes(uid);
+		sendcomm.insert(sendcomm.begin(), copycomm.begin(), copycomm.end());
 		//カードへデータを送信する
-		con->Transmit(sendcomm);
+		recvdata = con->Transmit(sendcomm);
 		return;
 	}
 
 	/*概要:データ受信コマンドを作成するための関数
 	作成日:2017.10.12
 	作成者:K.Asada*/
-	std::vector<CONSTANTGROUP::SENDCOMM> ReadyGetData() {
-		CONSTANTGROUP::SENDCOMM authenticate = CONSTANTGROUP::AUTHENTICATE;    //認証キーコマンドのコピーを作る
-		CONSTANTGROUP::SENDCOMM readcard = CONSTANTGROUP::READCARD;             //受信コマンドのコピーを作る
-		std::vector<CONSTANTGROUP::SENDCOMM> sendcomm;                         //組み立てたコマンドを格納するための配列
-		int blockindex = 0;                                                    //認証先ブロックを格納する変数
-		//受信コマンドの初期値としてキー認証コマンドをセットする
-		sendcomm.push_back(CONSTANTGROUP::LOADKEY);
-		//受信コマンドの初期値としてブロック認証コマンドをセットする
-		sendcomm.push_back(CONSTANTGROUP::AUTHENTICATE);
+	std::vector<SENDCOMM> ReadyGetData(int blockindex) {
+		SENDCOMM authenticate = AUTHENTICATE;    //認証キーコマンドのコピーを作る
+		SENDCOMM readcard = READCARD;             //受信コマンドのコピーを作る
+		std::vector<SENDCOMM> sendcomm;                         //組み立てたコマンドを格納するための配列
+		//コマンドの初期化処理を行う
+		sendcomm = InitCommand(blockindex);
 		//受信コマンドを組み立てていく
-		for (int i = CONSTANTGROUP::BEGIN_BLOCK; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
-			//読込先のブロックを取得する
-			blockindex = i;
+		for (; blockindex < END_BLOCK; blockindex++) {
 			//読込先がセクターの終端ブロックの場合は読み飛ばす
 			if (blockindex % 4 != 3) {
 				//読込先ブロックを設定する
@@ -250,8 +239,6 @@ public:
 	作成者:K.Asada*/
 	void SetAdmissionTimes(std::string uid) {
 		int times;            //取得した日時分を分に変換したものを格納する
-		//年月をチェックする関数を呼び出し、年月が現在年月と異なっていたら書き換える
-		CheckYears(uid);
 		std::ofstream ofs(uid, std::ios::app);    //データを書き込む対象のファイルを開く
 		//関数より現在日時分を取得する
 		times = GetAdmissionTime();
@@ -259,6 +246,8 @@ public:
 		ofs << std::bitset<16>(times);
 		//書き出しを終えたら閉じる
 		ofs.close();
+		//年月をチェックする関数を呼び出し、年月が現在年月と異なっていたら書き換える
+		CheckYears(uid);
 		return;
 	}
 
@@ -287,7 +276,7 @@ public:
 		struct tm *pnow = localtime(&now);//現在時刻を取得するための構造体を宣言
 		int years;                       //取得した現在時刻を格納するための変数
 		std::vector<std::string> admyear;                     //ファイルから取得した年月を格納するための変数
-		std::string tmp;
+		std::string check = "";
 		//現在年月を取得する
 		years = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
 		//ファイルから年月を取得するためのストリームを開く
@@ -295,11 +284,13 @@ public:
 		//ファイルから一行ごとにデータをすべて取得する
 		for (int i = 0; !ifs.eof(); i++) {
 			//1行ずつ取得する
-			std::getline(ifs, tmp);
-			admyear.push_back(tmp);
+			std::getline(ifs, check);
+			admyear.push_back(check);
 		}
+		//ファイルから読み込んだ文字列より年月日情報を取得する
+		check = admyear[1].substr(YEAR_INDEX, 32);
 		//取得したデータの年月が現在の年月と異なっていれば上書きする
-		if (admyear[5] != std::to_string(years)) {
+		if (check != std::to_string(years)) {
 			std::string bit(std::bitset<32>(years).to_string<char, std::char_traits<char>, std::allocator<char> >());
 			//対象を上書きする
 			admyear[5] = bit;
@@ -324,7 +315,7 @@ public:
 	/*概要:年月日などのbitデータを送信するためのコマンドを作る関数
 	作成日:2017.10.12
 	作成者:K.Asada*/
-	std::vector<CONSTANTGROUP::SENDCOMM> ReadySetTimes(std::string uid) {
+	std::vector<SENDCOMM> ReadySetTimes(std::string uid) {
 		std::vector<CONSTANTGROUP::SENDCOMM> sendtime;
 		CONSTANTGROUP::SENDCOMM authenticate = CONSTANTGROUP::AUTHENTICATE;
 		CONSTANTGROUP::SENDCOMM sendcard = CONSTANTGROUP::SENDCARD;
@@ -357,5 +348,23 @@ public:
 			}
 		}
 		return sendtime;
+	}
+
+	/*概要:コマンドの初期化処理関数
+	引数:int beginblock:コマンドを送信して初めにアクセスするブロック
+	戻り値:std::vector<SENDCOMM> initcommand:作成したコマンド
+	作成日:2017.10.13
+	作成者:K.Asada*/
+	std::vector<SENDCOMM> InitCommand(int beginblock) {
+		std::vector<SENDCOMM> initcommand;    //作成したコマンドを格納するための配列
+		SENDCOMM certify = AUTHENTICATE;                                    //ブロック認証コマンド
+		//ブロック認証コマンドの認証先ブロックを書き換える
+		certify.sendCommand[7] = beginblock;
+		//コマンドを組み立てていく
+		initcommand.push_back(LOADKEY);
+		//認証コマンドを組み立てていく
+		initcommand.push_back(certify);
+		//組み立てたコマンドを返却する
+		return initcommand;
 	}
 };
