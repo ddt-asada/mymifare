@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CONSTANTS.h"
+
 namespace sdkmifare {
 
 	using namespace System;
@@ -520,6 +522,7 @@ namespace sdkmifare {
 		}
 #pragma endregion
 		public:String^ UID = "";
+		private:CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();
 	/*概要:新規作成画面を閉じるときのイベント
 	作成日:2017.10.10
 	作成者:K.Asada*/
@@ -535,12 +538,12 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	writer->Write(this->SetByte(this->textBoxPASS->Text, 8));
 	writer->Write(this->SetByte(this->textBoxBirthYear->Text + "年" + this->textBoxBirthMonth->Text + "月" + this->textBoxBirthDay->Text + "日", 16));
 	writer->Write(this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
-	writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 80));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxElement->SelectedIndex, 2), 4 * 8));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxAdmin->SelectedIndex, 2), 4 * 8));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxOccupations->SelectedIndex, 2), 4 * 8));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxDepart->SelectedIndex, 2), 3 * 8));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxPosition->SelectedIndex, 2), 1 * 8));
+	writer->Write(this->SetByte(this->textBoxAdress->Text, 80));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxElement->SelectedIndex), 1));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxAdmin->SelectedIndex), 1));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxOccupations->SelectedIndex), 1));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxDepart->SelectedIndex), 1));
+	writer->Write(this->SetByte(Convert::ToString(this->comboBoxPosition->SelectedIndex), 12));
 	writer->Close();
 	this->Close();
 }
@@ -554,7 +557,7 @@ private:System::String^ SetByte(String^ data, Int32 setbyte) {
 		}
 	}
 	else {
-		throw gcnew System::Exception(OVER_ERROR_MESSAGE);
+		throw gcnew System::Exception(Constants->OVER_ERROR_MESSAGE);
 	}
 	return data;
 }

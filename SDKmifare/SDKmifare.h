@@ -139,50 +139,60 @@ namespace sdkmifare {
 		}
 #pragma endregion
 private:SCARDCONTEXT hContext = 0;		//読み込んだリソースマネージャへのポインタ
-		public:SCARDHANDLE hCard = 0;		//読み込んだカードへのポインタ
-		DWORD ActivProtocol = 0;//プロトコル
+		std::vector<std::vector<unsigned char>>* carddata = new std::vector<std::vector<unsigned char>>();           //取得したカードデータ
 		std::string* Uid = new std::string("asada");				//読み込んだカードのユーザーID
+		CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();
 
 
 /*概要:作成ボタンを押したときのクリックイベント
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventArgs^  e) {
-	InputNewUserForm^ create = gcnew InputNewUserForm();    //新規ユーザー情報を入力するためのクラスをインスタンス化
-	AdmissionSystem* adm = new AdmissionSystem();           //入館管理システム関連のクラスをインスタンス化
-	//新規で作成する旨を伝える
-	MessageBox::Show(NEW_MESSAGE);
-	//作成画面でOKが押されたらそのまま作成する
-	if (create->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-		std::string id;
-		this->MarshalString(create->UID, id);
-		//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
-		MessageBox::Show(SET_CARD_MESSAGE);
-		//カードからデータを取得する関数を呼び出す
-		adm->SetCardData(id);
-		//作成完了のメッセージを表示する
-		MessageBox::Show(FINISH_MESSAGE);
-	}//OK以外の時は作成が中断されたとする
-	else {
-		MessageBox::Show(CANCEL_MESSAGE);
+	try {
+		InputNewUserForm^ create = gcnew InputNewUserForm();    //新規ユーザー情報を入力するためのクラスをインスタンス化
+		AdmissionSystem* adm = new AdmissionSystem();           //入館管理システム関連のクラスをインスタンス化
+		//新規で作成する旨を伝える
+		MessageBox::Show(Constants->NEW_MESSAGE);
+		//作成画面でOKが押されたらそのまま作成する
+		if (create->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			std::string id;
+			this->MarshalString(create->UID, id);
+			//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
+			MessageBox::Show(Constants->SET_CARD_MESSAGE);
+			//カードからデータを取得する関数を呼び出す
+			adm->SetCardData(id);
+			//作成完了のメッセージを表示する
+			MessageBox::Show(Constants->FINISH_MESSAGE);
+		}//OK以外の時は作成が中断されたとする
+		else {
+			MessageBox::Show(Constants->CANCEL_MESSAGE);
+		}
+		return;
 	}
-	return;
+	catch (System::Exception^ e) {
+		//MessageBox::Show(e);
+	}
 }
 
 /*概要:退館ボタンを押したときのクリックイベント
 作成日：2017.10.10
 作成者：K.Asada*/
 private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
+	try {
+		AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
 	//退館日を記録する
-	adm->SetAdmissionTimes(*this->Uid);
-	//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
-	MessageBox::Show(SET_CARD_MESSAGE);
-	//カードからデータを取得する関数を呼び出す
-	adm->SetCardData(*this->Uid);
-	//退館時のメッセージを表示する
-	MessageBox::Show(LEAVE_MESSAGE);
-	return;
+		adm->SetAdmissionTimes(*this->Uid);
+		//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
+		MessageBox::Show(Constants->SET_CARD_MESSAGE);
+		//カードからデータを取得する関数を呼び出す
+		adm->SetCardData(*this->Uid);
+		//退館時のメッセージを表示する
+		MessageBox::Show(Constants->LEAVE_MESSAGE);
+		return;
+	}
+	catch (System::Exception^ e) {
+	//	MessageBox::Show(e);
+	}
 }
 
 
@@ -190,21 +200,26 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs^  e) {
-	AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
-	PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
-	std::string passtring = "";                      //パスワードを格納するための文字列
-	//メッセージを表示する
-	MessageBox::Show(SET_CARD_MESSAGE);
-	//パスワード入力画面に移行する
-	pass->ShowDialog();
-	//受け取ったパスを変換するStringからstringへ
-	this->MarshalString(pass->textBox1->Text, passtring);
-	//カードデータを受信する関数を呼び出す
-	adm->GetCardData(passtring);
-	this->CreateDisp();
-	//入館完了のメッセージを表示する
-	MessageBox::Show(ENTER_MESSAGE);
-	return;
+	try {
+		AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
+		PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
+		std::string passtring = "";                      //パスワードを格納するための文字列
+		//メッセージを表示する
+		MessageBox::Show(Constants->SET_CARD_MESSAGE);
+		//パスワード入力画面に移行する
+		pass->ShowDialog();
+		//受け取ったパスを変換するStringからstringへ
+		this->MarshalString(pass->textBox1->Text, passtring);
+		//カードデータを受信する関数を呼び出す
+		adm->GetCardData(passtring);
+		this->CreateDisp();
+		//入館完了のメッセージを表示する
+		MessageBox::Show(Constants->ENTER_MESSAGE);
+		return;
+	}
+	catch (System::Exception^ e) {
+	//	MessageBox::Show(e);
+	}
 }
 
 
@@ -212,20 +227,88 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 作成日:2017.10.10
 作成者:K.Asada*/
 private: System::Void CreateDisp() {
-//	std::string showdata = "";    //表示するための文字列を格納するための文字
-	std::string test = *this->Uid;
-	//ユーザIDより各種情報が格納されたテキストを開く
-	std::ifstream ifs;
-	//ストリームより文字列を取得する
-	ifs.open(test.c_str());
-	std::istreambuf_iterator<char> it(ifs);
-	std::istreambuf_iterator<char>last;
-	std::string showdata(it, last);
-	//文字列より表示するためのラベルを作成する
+	std::string showdata = "";            //カードより取得した文字列を格納する
+	std::vector<std::string>times;        //カードより取得した日時分を示す文字列を格納する
+	showdata = (this->carddata[0], this->carddata[0].size());
+	//カードデータより名前(漢字)を示す文字列を取得し、メイン画面に設定する
+	this->labelInfomasion->Text = gcnew String(showdata.c_str);
+	//カードデータより名前(フリガナ)を取得し、メイン画面に設定する
+	showdata = (this->carddata[1], this->carddata[1].size());
 	this->labelInfomasion->Text = gcnew String(showdata.c_str());
+	//カードデータより住所を取得し、メイン画面に設定する
+	showdata = ((this->carddata[3], this->carddata[3].size()) + (this->carddata[4], this->carddata[4].size()) + (this->carddata[5], this->carddata[5].size()) + (this->carddata[6], this->carddata[6].size()) + (this->carddata[7], this->carddata[7].size()));
+	this->labelInfomasion->Text = gcnew String(showdata.c_str());
+	//カードデータより電話番号を取得し、メイン画面に設定する
+	showdata = (this->carddata[8], this->carddata[8].size());
+	this->labelInfomasion->Text = gcnew String(showdata.c_str());
+	//カードデータより誕生日を取得し、メイン画面に設定する
+	showdata = (this->carddata[9], this->carddata[9].size());
+	this->labelInfomasion->Text = gcnew String(showdata.c_str());
+	//カードデータより年月を取得し、メイン画面に設定する
+	this->labelInfomasion->Text = gcnew String(this->ConvYears(*this->carddata).c_str());
+	//カードデータより日時分を取得する
+	times = this->ConvTimes(*this->carddata);
+	//メイン画面へ日時分を設定する
+	for (int i = 0; i < times.size(); i++) {
+		//メイン画面へ設定する
+		this->labelInfomasion->Text = gcnew String(times[i].c_str());
+	}
 	return;
 }
 
+/*概要:カードに格納された日時分情報を文字列に変換する関数
+引数:std::vector<std::vcotr<unsigned char>> data:カードデータ
+戻り値:std::vector<string> times:日時分を文字列に変換した配列
+作成日:2017.10.16
+作成者:K.Asada*/
+private: std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data) {
+	std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
+	ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
+	int day = 0;                           //取得した日を格納する変数
+	int hour = 0;                          //取得した時間を格納する変数
+	int min = 0;                           //取得した分を格納する変数
+	//カードデータにある日時分情報を走査していく
+	for (int i = 0; data[TIMES_1_INDEX][i * 2] != 0; i++) {
+		//カードデータより日時分の上位8ビットを取得する
+		gettimes.bytes[1] = data[TIMES_1_INDEX][i * 2];
+		//カードデータより日時分の下位8ビットを取得する
+		gettimes.bytes[0] = data[TIMES_1_INDEX][i * 2 + 1];
+		//取得した日時分を日に変換する
+		day = gettimes.num / 1440;
+		//取得した日時分を時に変換する
+		hour = gettimes.num / 60 - day * 24;
+		//取得した日時分を分に変換する
+		min = gettimes.num - 1440 * day - 24 * hour;
+		//変換した日時分を連結して文字列を完成させる
+		times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分");
+	}
+	//変換した文字列を返却する
+	return times;
+}
+
+/*概要:カードに格納された年月情報を文字列に変換するための関数
+引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+戻り値:std::vector<std::string> years:文字列に変換した年月
+作成日:2017.10.16
+作成者:K.Asada*/
+private: std::string ConvYears(std::vector<std::vector<unsigned char>> data) {
+	std::string years;        //変換した文字列を格納する
+	ITOC getyears;            //カードより取得した年月をunsigned int型に変換するための共有体
+	int year = 0;             //取得した年
+	int month = 0;            //取得した月
+	//カードデータより年月の上位8ビットを取得する
+	getyears.bytes[1] = data[YEAR_INDEX][0];
+	//カードデータより年月の下位8ビットを取得する
+	getyears.bytes[0] = data[YEAR_INDEX][1];
+	//年月を年に変換する
+	year = getyears.num / 12;
+	//年月を月に変換する
+	month = getyears.num % 12;
+	//変換した年月を連結して文字列を完成させる
+	years = (std::to_string(year) + "年" + std::to_string(month) + "月");
+	//変換した文字列を返却する
+	return years;
+}
 
 /*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
 作成日：2017.10.10
