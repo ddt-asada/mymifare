@@ -95,7 +95,7 @@ namespace CONSTANTGROUP {
 		//入退館日が格納されているブロック番号
 		static const int TIMES_6_INDEX = 17;
 		//カードリーダの名前
-	static const LPTSTR PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
+//	LPTSTR PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
 	static const SENDCOMM LOADKEY = { 11,{ 0xFF,0x82,0x00,0x00,0x06,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } };
 	//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
 	// General Authenticate

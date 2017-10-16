@@ -191,7 +191,7 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 		return;
 	}
 	catch (System::Exception^ e) {
-	//	MessageBox::Show(e);
+		System::Console::Write(e);
 	}
 }
 
@@ -231,7 +231,7 @@ private: System::Void CreateDisp() {
 	std::vector<std::string>times;        //カードより取得した日時分を示す文字列を格納する
 	showdata = (this->carddata[0], this->carddata[0].size());
 	//カードデータより名前(漢字)を示す文字列を取得し、メイン画面に設定する
-	this->labelInfomasion->Text = gcnew String(showdata.c_str);
+	this->labelInfomasion->Text = gcnew String(showdata.c_str());
 	//カードデータより名前(フリガナ)を取得し、メイン画面に設定する
 	showdata = (this->carddata[1], this->carddata[1].size());
 	this->labelInfomasion->Text = gcnew String(showdata.c_str());

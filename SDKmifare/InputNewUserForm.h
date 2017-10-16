@@ -531,6 +531,7 @@ namespace sdkmifare {
 	//	std::string setdata = "";     //ƒeƒLƒXƒg‚ÉŠi”[‚·‚é‚½‚ß‚Ì•¶Žš
 	}
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
+	this->UID = this->textBoxUID->Text;
 	System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text);
 	writer->Write(this->SetByte(this->textBoxName->Text, 16));
 	writer->Write(this->SetByte(this->textBoxNameKana->Text, 16));

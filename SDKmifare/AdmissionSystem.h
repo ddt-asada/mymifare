@@ -173,7 +173,7 @@ public:
 		sendcomm.insert(sendcomm.begin(), copycomm.begin(), copycomm.end());
 		//カードへデータを送信する
 		recvdata = con->LinkCard(sendcomm);
-		return;
+		return uid;
 	}
 
 	/*概要:データ受信コマンドを作成するための関数

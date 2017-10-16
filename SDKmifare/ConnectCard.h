@@ -12,6 +12,10 @@
 #define PCSC_TRANS_BUFF_LEN	(262)
 #define PCSC_RECV_BUFF_LEN	(262)
 
+using namespace CONSTANTGROUP;
+
+static LPTSTR PASORI_NAME = _T("Sony FeliCa Port/PaSoRi 3.0 0");
+
 public class ConnectCard {
 public:
 	ConnectCard() {
@@ -37,7 +41,7 @@ public:
 		return (SCARD_IO_REQUEST *)SCARD_PCI_T1;
 	}
 
-	msclr::gcroot<ConstantString^> Constants = gcnew ConstantString();
+	msclr::gcroot<CONSTANTGROUP::ConstantString^> Constants = gcnew CONSTANTGROUP::ConstantString();
 
 	/*概要：機器との通信を行うためのリソースマネージャを確保するための関数
 	引数：なし
@@ -116,7 +120,7 @@ public:
 	戻り値:DWORD ActiveProtocol:開通したプロトコル
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE hCard) {
+	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE &hCard) {
 		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		DWORD ActiveProtocol = 0; //プロトコル
@@ -150,7 +154,7 @@ public:
 		//カードとの接続を終了する
 		::SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 		//リーダーを解放する
-		::SCardFreeMemory(hContext, CONSTANTGROUP::PASORI_NAME);
+		::SCardFreeMemory(hContext, PASORI_NAME);
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;
@@ -163,7 +167,7 @@ public:
 	作成者：K.Asada*/
 	void EndConnect(SCARDCONTEXT hContext) {
 		//リーダーを解放する
-		::SCardFreeMemory(hContext, CONSTANTGROUP::PASORI_NAME);
+		::SCardFreeMemory(hContext, PASORI_NAME);
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;
