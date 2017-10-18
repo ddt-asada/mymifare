@@ -122,9 +122,8 @@ namespace sdkmifare {
 				static_cast<System::Byte>(128)));
 			this->labelInfomasion->Location = System::Drawing::Point(212, 535);
 			this->labelInfomasion->Name = L"labelInfomasion";
-			this->labelInfomasion->Size = System::Drawing::Size(75, 33);
+			this->labelInfomasion->Size = System::Drawing::Size(0, 33);
 			this->labelInfomasion->TabIndex = 4;
-			this->labelInfomasion->Text = L"aaaa";
 			// 
 			// label1
 			// 
@@ -147,8 +146,9 @@ namespace sdkmifare {
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(162, 363);
 			this->label2->TabIndex = 5;
-			this->label2->Text = L"名　　　前：\r\nふり 　がな：\r\n住　　　所：\r\n誕 生  日：\r\n電話番号：\r\n属　　　性：\r\n権　　　限：\r\n職　　　種：\r\n部　　　署：\r\n役　　　職：\r\n"
+			this->label2->Text = L"名　　　前：\r\nふり 　がな：\r\n住　　　所：\r\n電話番号：\r\n誕 生  日：\r\n属　　　性：\r\n権　　　限：\r\n職　　　種：\r\n部　　　署：\r\n役　　　職：\r\n"
 				L"入退館日：";
+			this->label2->Visible = false;
 			// 
 			// SDKmifare
 			// 
@@ -156,10 +156,10 @@ namespace sdkmifare {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->AutoSize = true;
-			this->ClientSize = System::Drawing::Size(1175, 649);
-			this->Controls->Add(this->label2);
+			this->ClientSize = System::Drawing::Size(1209, 649);
 			this->Controls->Add(this->labelInfomasion);
 			this->Controls->Add(this->labelCauntion);
+			this->Controls->Add(this->label2);
 			this->Controls->Add(this->buttonLeaving);
 			this->Controls->Add(this->buttonNewUser);
 			this->Controls->Add(this->buttonAdmission);
@@ -185,7 +185,7 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 		//新規で作成する旨を伝える
 		MessageBox::Show(Constants->NEW_MESSAGE);
 		//作成画面でOKが押されたらそのまま作成する
-		if (create->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+		if (create->ShowDialog() != System::Windows::Forms::DialogResult::Cancel) {
 			std::string id;
 			this->MarshalString(create->UID, id);
 			//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
@@ -223,7 +223,7 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 		//カードデータよりユーザIDを取得する
 		uid = adm->GetData(*this->carddata, UID_INDEX, 0, 8);
     	//退館日を記録する
-		adm->SetAdmissionTimes(uid);
+		adm->SetLeaveTimes(uid);
 		//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
 		MessageBox::Show(Constants->SET_CARD_MESSAGE);
 		//カードからデータを取得する関数を呼び出す
@@ -236,6 +236,8 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 		this->labelCauntion->Text = Constants->LEAVE_MESSAGE;
 		//保存しているユーザーのカードデータを削除する
 		this->carddata->clear();
+		//情報ラベルを削除する
+		this->label2->Visible = false;
 		//退館時のメッセージを表示する
 		MessageBox::Show(Constants->LEAVE_MESSAGE);
 		return;
@@ -268,6 +270,8 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		this->CreateDisp();
 		//入館状態であることをメイン画面へ表示する
 		this->labelCauntion->Text = Constants->ENTER_MESSAGE;
+		//情報ラベルをメイン画面へ追加する
+		this->label2->Visible = true;
 		//入館完了のメッセージを表示する
 		MessageBox::Show(Constants->ENTER_MESSAGE);
 		return;
@@ -328,6 +332,7 @@ private: System::Void CreateDisp() {
 		showdata += this->ConvYears(*this->carddata) + '\n';
 		//カードデータより日時分を示す文字列を取得する
 		showdata += this->ConvTimes(*this->carddata) + '\n';
+		showdata += this->ConvLeaveTimes(*this->carddata);
 		//メイン画面へ文字列を反映する
 		this->labelInfomasion->Text = gcnew String(showdata.c_str());
 		return;
@@ -351,7 +356,7 @@ private: std::string ConvTimes(std::vector<std::vector<unsigned char>> data) {
 		int min = 0;                           //取得した分を格納する変数
 		int timeindex = TIMES_1_INDEX;
 		//カードデータにある日時分情報を走査していく
-		for (int i = 1; data[timeindex][i * 2] != 0; i++) {
+		for (int i = 1; data[timeindex][i * 2] != ' '; i++) {
 			//カードデータより日時分の上位8ビットを取得する
 			gettimes.bytes[1] = data[timeindex][i * 2];
 			//カードデータより日時分の下位8ビットを取得する
@@ -376,6 +381,41 @@ private: std::string ConvTimes(std::vector<std::vector<unsigned char>> data) {
 		System::Console::WriteLine(e);
 	}
 }
+
+		 private: std::string ConvLeaveTimes(std::vector<std::vector<unsigned char>> data) {
+			 try {
+				 std::string times = "";        //日時分を文字列に変換したものを格納するための配列
+				 ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
+				 int day = 0;                           //取得した日を格納する変数
+				 int hour = 0;                          //取得した時間を格納する変数
+				 int min = 0;                           //取得した分を格納する変数
+				 int timeindex = LEAVE_1_INDEX;
+				 //カードデータにある日時分情報を走査していく
+				 for (int i = 0; data[timeindex][i * 2] != ' '; i++) {
+					 //カードデータより日時分の上位8ビットを取得する
+					 gettimes.bytes[1] = data[timeindex][i * 2];
+					 //カードデータより日時分の下位8ビットを取得する
+					 gettimes.bytes[0] = data[timeindex][i * 2 + 1];
+					 //取得した日時分を日に変換する
+					 day = gettimes.num / 1440;
+					 //取得した日時分を時に変換する
+					 hour = gettimes.num / 60 - day * 24;
+					 //取得した日時分を分に変換する
+					 min = gettimes.num - 1440 * day - 60 * hour;
+					 //変換した日時分を連結して文字列を完成させる
+					 times += std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n';
+					 if (i == 7) {
+						 i = -1;
+						 timeindex++;
+					 }
+				 }
+				 //変換した文字列を返却する
+				 return times;
+			 }
+			 catch (System::IndexOutOfRangeException^ e) {
+				 System::Console::WriteLine(e);
+			 }
+		 }
 
 /*概要:カードに格納された年月情報を文字列に変換するための関数
 引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ

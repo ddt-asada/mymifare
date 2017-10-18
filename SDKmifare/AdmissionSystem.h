@@ -190,7 +190,7 @@ public:
 			//ユーザー情報を確認する関数を呼び出す
 			uid = CheckUser(recvdata, pass);
 			//入館時間を取得する関数を呼び出す
-			SetAdmissionTimes(uid);
+			SetEnterTimes(uid);
 			//入館時間をカードに記録させるためのコマンドを作成する
 			copycomm = ReadySetData(uid, BEGIN_BLOCK);
 			//コマンドを連結する
@@ -262,6 +262,48 @@ public:
 		return;
 	}
 
+	void SetEnterTimes(std::string uid) {
+		ITOC times;
+		char getdata[BLOCK_COUNT * 16];
+		CheckYears(uid);
+		times.num = GetAdmissionTime();
+		std::ifstream ifs(uid);
+		ifs.get(getdata, BLOCK_COUNT * 16);
+		for (int i = TIMES_1_INDEX * 16; i < LEAVE_1_INDEX * 16; i++) {
+			if (getdata[i] == ' ') {
+				getdata[i] = times.bytes[1];
+				getdata[i + 1] = times.bytes[0];
+				std::ofstream ofs(uid);
+				ofs << getdata;
+				ofs.close();
+				break;
+			}
+		}
+		ifs.close();
+		return;
+	}
+
+	void SetLeaveTimes(std::string uid) {
+		ITOC times;
+		char getdata[BLOCK_COUNT * 16];
+		CheckYears(uid);
+		times.num = GetAdmissionTime();
+		std::ifstream ifs(uid);
+		ifs.get(getdata, BLOCK_COUNT * 16);
+		for (int i = LEAVE_1_INDEX * 16; i < (LEAVE_4_INDEX + 1) * 16; i++) {
+			if (getdata[i] == ' ') {
+				getdata[i] = times.bytes[1];
+				getdata[i + 1] = times.bytes[0];
+				std::ofstream ofs(uid);
+				ofs << getdata;
+				ofs.close();
+				break;
+			}
+		}
+		ifs.close();
+		return;
+	}
+
 	/*概要:現在日時分を分に変換して取得する関数
 	引数:なし
 	戻り値:unsigned short int times:分
@@ -303,7 +345,7 @@ public:
 			//年月の後に格納されている日時分を削除する
 			for (int i = yearindex; i < sizeof(filedata); i++) {
 				//1バイトずつ'\0'に置き換えていく
-				filedata[i] = '\0';
+				filedata[i] = ' ';
 			}
 			//書き込み用のファイルストリームを開く
 			std::ofstream ofs(uid);

@@ -99,9 +99,13 @@ namespace CONSTANTGROUP {
 		//入退館日が格納されているブロック番号
 		static const int TIMES_4_INDEX = 14;
 		//入退館日が格納されているブロック番号
-		static 	const int TIMES_5_INDEX = 15;
+		static 	const int LEAVE_1_INDEX = 15;
 		//入退館日が格納されているブロック番号
-		static const int TIMES_6_INDEX = 16;
+		static const int LEAVE_2_INDEX = 16;
+		//入退館日が格納されているブロック番号
+		static const int LEAVE_3_INDEX = 17;
+		//入退館日が格納されているブロック番号
+		static const int LEAVE_4_INDEX = 18;
 		//属性の1ビット目の名前
 		static const char* ELEM_NAME1 = "一般人";
 		//属性の2ビット目の名前

@@ -244,7 +244,6 @@ namespace sdkmifare {
 			// 
 			// buttonOK
 			// 
-			this->buttonOK->DialogResult = System::Windows::Forms::DialogResult::OK;
 			this->buttonOK->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
 			this->buttonOK->Location = System::Drawing::Point(13, 610);
@@ -271,11 +270,13 @@ namespace sdkmifare {
 			// comboBoxElement
 			// 
 			this->comboBoxElement->FormattingEnabled = true;
-			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"一般人", L"管理者", L"要注意人物", L"危険人物" });
+			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"一般人", L"管理者", L"危険人物", L"要注意人物" });
 			this->comboBoxElement->Location = System::Drawing::Point(479, 329);
 			this->comboBoxElement->Name = L"comboBoxElement";
 			this->comboBoxElement->Size = System::Drawing::Size(409, 32);
+			this->comboBoxElement->Sorted = true;
 			this->comboBoxElement->TabIndex = 12;
+			this->comboBoxElement->SelectedIndex = 0;
 			// 
 			// comboBoxAdmin
 			// 
@@ -285,6 +286,7 @@ namespace sdkmifare {
 			this->comboBoxAdmin->Name = L"comboBoxAdmin";
 			this->comboBoxAdmin->Size = System::Drawing::Size(409, 32);
 			this->comboBoxAdmin->TabIndex = 13;
+			this->comboBoxAdmin->SelectedIndex = 0;
 			// 
 			// comboBoxOccupations
 			// 
@@ -294,6 +296,7 @@ namespace sdkmifare {
 			this->comboBoxOccupations->Name = L"comboBoxOccupations";
 			this->comboBoxOccupations->Size = System::Drawing::Size(409, 32);
 			this->comboBoxOccupations->TabIndex = 14;
+			this->comboBoxOccupations->SelectedIndex = 0;
 			// 
 			// comboBoxPosition
 			// 
@@ -303,6 +306,7 @@ namespace sdkmifare {
 			this->comboBoxPosition->Name = L"comboBoxPosition";
 			this->comboBoxPosition->Size = System::Drawing::Size(409, 32);
 			this->comboBoxPosition->TabIndex = 16;
+			this->comboBoxPosition->SelectedIndex = 0;
 			// 
 			// comboBoxDepart
 			// 
@@ -312,6 +316,7 @@ namespace sdkmifare {
 			this->comboBoxDepart->Name = L"comboBoxDepart";
 			this->comboBoxDepart->Size = System::Drawing::Size(409, 32);
 			this->comboBoxDepart->TabIndex = 15;
+			this->comboBoxDepart->SelectedIndex = 0;
 			// 
 			// label2
 			// 
@@ -522,6 +527,7 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		this->UID = this->textBoxUID->Text;
 		//ユーザIDが空の場合はファイルが生成できないのでその時点で処理を終了する
 		if (this->UID == "") {
+			MessageBox::Show("入力情報が不正です。\n確認してください。");
 			return;
 		}
 		//ファイル入力クラスをインスタンス化
@@ -553,7 +559,7 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		//入力を終了する
 		writer->Close();
 		//途中で不正が出ていないか走査する
-		for (int i = 0; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
+		for (int i = 0; i < index; i++) {
 			//不正が出ている箇所をチェックする
 			if (judge[i] == false) {
 				//不正があった場合はその旨を表示する
@@ -562,8 +568,10 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 				return;
 			}
 		}
+		this->DialogResult = System::Windows::Forms::DialogResult::OK;
 		//ダイアログを閉じる
 		this->Close();
+		return;
 	}
 	catch (System::Exception^ e) {
 		//エラーが発生した旨を表示する
