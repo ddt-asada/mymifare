@@ -81,9 +81,9 @@ public:
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
 		unsigned char RecvBuf[PCSC_RECV_BUFF_LEN] = { '\0' };
-		std::vector<std::vector<unsigned char>> RetBuf = { {'\0'} };
+		std::vector<std::vector<unsigned char>> RetBuf = std::vector<std::vector<unsigned char>>(BLOCK_COUNT, std::vector<unsigned char>(0));
 		unsigned long ResponseSize = 0;
-		//unsigned long lResult;
+		int blockindex = -1;
 		//全てのコマンドを送信するまで繰り返す
 		for (int i = 0; SendComm[i].sendLength > -1; i++) {
 			//受信の最大サイズを取得する
@@ -98,10 +98,13 @@ public:
 				EndConnect(hContext, hCard);
 			}
 			for (UINT RespIdx = 0; RespIdx < ResponseSize; RespIdx++) {
+				if (RespIdx == 0 && ResponseSize != 2) {
+					RetBuf[++blockindex].push_back(RecvBuf[RespIdx]);
+				}
 				//受信データの末尾二つのデータは通信正否の判定なので読み飛ばす
-				if (RespIdx < ResponseSize - 2) {
+				else if (RespIdx < ResponseSize - 2) {
 					//受信したデータを返却用の配列に格納する
-					RetBuf[i].push_back(RecvBuf[RespIdx]);
+					RetBuf[blockindex].push_back(RecvBuf[RespIdx]);
 				}
 				//末尾二つのデータをコンソールに表示する
 				else {
@@ -154,7 +157,7 @@ public:
 		//カードとの接続を終了する
 		::SCardDisconnect(hCard, SCARD_LEAVE_CARD);
 		//リーダーを解放する
-		::SCardFreeMemory(hContext, PASORI_NAME);
+//		::SCardFreeMemory(hContext, PASORI_NAME);
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;

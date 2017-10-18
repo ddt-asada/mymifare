@@ -60,14 +60,14 @@ namespace sdkmifare {
 			// 
 			// textBox1
 			// 
-			this->textBox1->Location = System::Drawing::Point(12, 45);
+			this->textBox1->Location = System::Drawing::Point(12, 104);
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->Size = System::Drawing::Size(614, 31);
 			this->textBox1->TabIndex = 0;
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(109, 80);
+			this->button1->Location = System::Drawing::Point(117, 141);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(403, 80);
 			this->button1->TabIndex = 1;
@@ -80,7 +80,7 @@ namespace sdkmifare {
 			this->label1->AutoSize = true;
 			this->label1->Font = (gcnew System::Drawing::Font(L"ÇlÇr ÉSÉVÉbÉN", 12, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->label1->Location = System::Drawing::Point(81, 9);
+			this->label1->Location = System::Drawing::Point(81, 27);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(477, 33);
 			this->label1->TabIndex = 2;
@@ -90,7 +90,7 @@ namespace sdkmifare {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(638, 172);
+			this->ClientSize = System::Drawing::Size(638, 233);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->textBox1);

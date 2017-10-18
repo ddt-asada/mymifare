@@ -60,7 +60,7 @@ namespace sdkmifare {
 	private: System::Windows::Forms::ComboBox^  comboBoxOccupations;
 	private: System::Windows::Forms::ComboBox^  comboBoxPosition;
 	private: System::Windows::Forms::ComboBox^  comboBoxDepart;
-	private: System::Windows::Forms::ComboBox^  comboBox6;
+
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
 	private: System::Windows::Forms::Label^  label4;
@@ -110,7 +110,6 @@ namespace sdkmifare {
 			this->comboBoxOccupations = (gcnew System::Windows::Forms::ComboBox());
 			this->comboBoxPosition = (gcnew System::Windows::Forms::ComboBox());
 			this->comboBoxDepart = (gcnew System::Windows::Forms::ComboBox());
-			this->comboBox6 = (gcnew System::Windows::Forms::ComboBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label4 = (gcnew System::Windows::Forms::Label());
@@ -138,17 +137,19 @@ namespace sdkmifare {
 			// 
 			// textBoxPASS
 			// 
+			this->textBoxPASS->ImeMode = System::Windows::Forms::ImeMode::Alpha;
 			this->textBoxPASS->Location = System::Drawing::Point(479, 287);
 			this->textBoxPASS->Name = L"textBoxPASS";
 			this->textBoxPASS->Size = System::Drawing::Size(409, 31);
-			this->textBoxPASS->TabIndex = 5;
+			this->textBoxPASS->TabIndex = 11;
 			// 
 			// textBoxUID
 			// 
+			this->textBoxUID->ImeMode = System::Windows::Forms::ImeMode::Alpha;
 			this->textBoxUID->Location = System::Drawing::Point(479, 239);
 			this->textBoxUID->Name = L"textBoxUID";
 			this->textBoxUID->Size = System::Drawing::Size(409, 31);
-			this->textBoxUID->TabIndex = 4;
+			this->textBoxUID->TabIndex = 10;
 			// 
 			// textBoxAdress
 			// 
@@ -249,7 +250,7 @@ namespace sdkmifare {
 			this->buttonOK->Location = System::Drawing::Point(13, 610);
 			this->buttonOK->Name = L"buttonOK";
 			this->buttonOK->Size = System::Drawing::Size(460, 89);
-			this->buttonOK->TabIndex = 12;
+			this->buttonOK->TabIndex = 17;
 			this->buttonOK->Text = L"OK";
 			this->buttonOK->UseVisualStyleBackColor = true;
 			this->buttonOK->Click += gcnew System::EventHandler(this, &InputNewUserForm::buttonOK_Click);
@@ -262,7 +263,7 @@ namespace sdkmifare {
 			this->buttonCancel->Location = System::Drawing::Point(479, 610);
 			this->buttonCancel->Name = L"buttonCancel";
 			this->buttonCancel->Size = System::Drawing::Size(416, 89);
-			this->buttonCancel->TabIndex = 13;
+			this->buttonCancel->TabIndex = 18;
 			this->buttonCancel->Text = L"キャンセル";
 			this->buttonCancel->UseVisualStyleBackColor = true;
 			this->buttonCancel->Click += gcnew System::EventHandler(this, &InputNewUserForm::buttonCancel_Click);
@@ -270,55 +271,47 @@ namespace sdkmifare {
 			// comboBoxElement
 			// 
 			this->comboBoxElement->FormattingEnabled = true;
-			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"属性1", L"属性2" });
+			this->comboBoxElement->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"一般人", L"管理者", L"要注意人物", L"危険人物" });
 			this->comboBoxElement->Location = System::Drawing::Point(479, 329);
 			this->comboBoxElement->Name = L"comboBoxElement";
 			this->comboBoxElement->Size = System::Drawing::Size(409, 32);
-			this->comboBoxElement->TabIndex = 6;
+			this->comboBoxElement->TabIndex = 12;
 			// 
 			// comboBoxAdmin
 			// 
 			this->comboBoxAdmin->FormattingEnabled = true;
-			this->comboBoxAdmin->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"権限1", L"権限2" });
+			this->comboBoxAdmin->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"一般", L"管理者" });
 			this->comboBoxAdmin->Location = System::Drawing::Point(479, 377);
 			this->comboBoxAdmin->Name = L"comboBoxAdmin";
 			this->comboBoxAdmin->Size = System::Drawing::Size(409, 32);
-			this->comboBoxAdmin->TabIndex = 7;
+			this->comboBoxAdmin->TabIndex = 13;
 			// 
 			// comboBoxOccupations
 			// 
 			this->comboBoxOccupations->FormattingEnabled = true;
-			this->comboBoxOccupations->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"職種1", L"職種2" });
+			this->comboBoxOccupations->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"営業", L"総務", L"事務", L"PG" });
 			this->comboBoxOccupations->Location = System::Drawing::Point(479, 425);
 			this->comboBoxOccupations->Name = L"comboBoxOccupations";
 			this->comboBoxOccupations->Size = System::Drawing::Size(409, 32);
-			this->comboBoxOccupations->TabIndex = 8;
+			this->comboBoxOccupations->TabIndex = 14;
 			// 
 			// comboBoxPosition
 			// 
 			this->comboBoxPosition->FormattingEnabled = true;
-			this->comboBoxPosition->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"役職1", L"役職2" });
+			this->comboBoxPosition->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"パート", L"研修", L"一般社員", L"部長" });
 			this->comboBoxPosition->Location = System::Drawing::Point(479, 521);
 			this->comboBoxPosition->Name = L"comboBoxPosition";
 			this->comboBoxPosition->Size = System::Drawing::Size(409, 32);
-			this->comboBoxPosition->TabIndex = 10;
+			this->comboBoxPosition->TabIndex = 16;
 			// 
 			// comboBoxDepart
 			// 
 			this->comboBoxDepart->FormattingEnabled = true;
-			this->comboBoxDepart->Items->AddRange(gcnew cli::array< System::Object^  >(2) { L"部署1", L"部署2" });
+			this->comboBoxDepart->Items->AddRange(gcnew cli::array< System::Object^  >(4) { L"営業部", L"総務部", L"経理部", L"開発部" });
 			this->comboBoxDepart->Location = System::Drawing::Point(479, 473);
 			this->comboBoxDepart->Name = L"comboBoxDepart";
 			this->comboBoxDepart->Size = System::Drawing::Size(409, 32);
-			this->comboBoxDepart->TabIndex = 9;
-			// 
-			// comboBox6
-			// 
-			this->comboBox6->FormattingEnabled = true;
-			this->comboBox6->Location = System::Drawing::Point(480, 569);
-			this->comboBox6->Name = L"comboBox6";
-			this->comboBox6->Size = System::Drawing::Size(409, 32);
-			this->comboBox6->TabIndex = 11;
+			this->comboBoxDepart->TabIndex = 15;
 			// 
 			// label2
 			// 
@@ -380,21 +373,21 @@ namespace sdkmifare {
 			this->textBoxTELL1->Location = System::Drawing::Point(479, 194);
 			this->textBoxTELL1->Name = L"textBoxTELL1";
 			this->textBoxTELL1->Size = System::Drawing::Size(84, 31);
-			this->textBoxTELL1->TabIndex = 45;
+			this->textBoxTELL1->TabIndex = 7;
 			// 
 			// textBoxTELL2
 			// 
 			this->textBoxTELL2->Location = System::Drawing::Point(606, 194);
 			this->textBoxTELL2->Name = L"textBoxTELL2";
 			this->textBoxTELL2->Size = System::Drawing::Size(120, 31);
-			this->textBoxTELL2->TabIndex = 46;
+			this->textBoxTELL2->TabIndex = 8;
 			// 
 			// textBoxTELL3
 			// 
 			this->textBoxTELL3->Location = System::Drawing::Point(769, 194);
 			this->textBoxTELL3->Name = L"textBoxTELL3";
 			this->textBoxTELL3->Size = System::Drawing::Size(118, 31);
-			this->textBoxTELL3->TabIndex = 47;
+			this->textBoxTELL3->TabIndex = 9;
 			// 
 			// label5
 			// 
@@ -445,21 +438,21 @@ namespace sdkmifare {
 			this->textBoxBirthDay->Location = System::Drawing::Point(785, 152);
 			this->textBoxBirthDay->Name = L"textBoxBirthDay";
 			this->textBoxBirthDay->Size = System::Drawing::Size(62, 31);
-			this->textBoxBirthDay->TabIndex = 52;
+			this->textBoxBirthDay->TabIndex = 6;
 			// 
 			// textBoxBirthMonth
 			// 
 			this->textBoxBirthMonth->Location = System::Drawing::Point(659, 150);
 			this->textBoxBirthMonth->Name = L"textBoxBirthMonth";
 			this->textBoxBirthMonth->Size = System::Drawing::Size(67, 31);
-			this->textBoxBirthMonth->TabIndex = 51;
+			this->textBoxBirthMonth->TabIndex = 5;
 			// 
 			// textBoxBirthYear
 			// 
 			this->textBoxBirthYear->Location = System::Drawing::Point(485, 148);
 			this->textBoxBirthYear->Name = L"textBoxBirthYear";
 			this->textBoxBirthYear->Size = System::Drawing::Size(115, 31);
-			this->textBoxBirthYear->TabIndex = 50;
+			this->textBoxBirthYear->TabIndex = 4;
 			// 
 			// label16
 			// 
@@ -476,7 +469,7 @@ namespace sdkmifare {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(904, 710);
+			this->ClientSize = System::Drawing::Size(924, 724);
 			this->Controls->Add(this->label16);
 			this->Controls->Add(this->label8);
 			this->Controls->Add(this->label15);
@@ -493,7 +486,6 @@ namespace sdkmifare {
 			this->Controls->Add(this->label4);
 			this->Controls->Add(this->label3);
 			this->Controls->Add(this->label2);
-			this->Controls->Add(this->comboBox6);
 			this->Controls->Add(this->comboBoxDepart);
 			this->Controls->Add(this->comboBoxPosition);
 			this->Controls->Add(this->comboBoxOccupations);
@@ -515,7 +507,6 @@ namespace sdkmifare {
 			this->Controls->Add(this->textBoxNameKana);
 			this->Name = L"InputNewUserForm";
 			this->Text = L"InputNewUserForm";
-			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &InputNewUserForm::InputNewUserForm_FormClosed);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -523,46 +514,110 @@ namespace sdkmifare {
 #pragma endregion
 		public:String^ UID = "";
 		private:CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();
-	/*概要:新規作成画面を閉じるときのイベント
-	作成日:2017.10.10
-	作成者:K.Asada*/
-	private: System::Void InputNewUserForm_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
-//		std::string filename = "";    //ファイル名を格納するための文字列
-	//	std::string setdata = "";     //テキストに格納するための文字
-	}
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->UID = this->textBoxUID->Text;
-	System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text);
-	writer->Write(this->SetByte(this->textBoxName->Text, 16));
-	writer->Write(this->SetByte(this->textBoxNameKana->Text, 16));
-	writer->Write(this->SetByte(this->textBoxUID->Text, 8));
-	writer->Write(this->SetByte(this->textBoxPASS->Text, 8));
-	writer->Write(this->SetByte(this->textBoxBirthYear->Text + "年" + this->textBoxBirthMonth->Text + "月" + this->textBoxBirthDay->Text + "日", 16));
-	writer->Write(this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
-	writer->Write(this->SetByte(this->textBoxAdress->Text, 80));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxElement->SelectedIndex), 1));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxAdmin->SelectedIndex), 1));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxOccupations->SelectedIndex), 1));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxDepart->SelectedIndex), 1));
-	writer->Write(this->SetByte(Convert::ToString(this->comboBoxPosition->SelectedIndex), 12));
-	writer->Close();
-	this->Close();
+	try {
+		Boolean judge[CONSTANTGROUP::BLOCK_COUNT] = { true };
+		Int32 index = 0;
+		//ユーザーIDをメンバへ保管する
+		this->UID = this->textBoxUID->Text;
+		//ユーザIDが空の場合はファイルが生成できないのでその時点で処理を終了する
+		if (this->UID == "") {
+			return;
+		}
+		//ファイル入力クラスをインスタンス化
+		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text, false, System::Text::Encoding::GetEncoding("shift_jis"));
+		//名前(漢字)を16バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxName->Text, 16, writer);
+		//名前(ふりがな)を16バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxNameKana->Text, 16, writer);
+		//ユーザーIDを8バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxUID->Text, 8, writer);
+		//パスワードを8バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxPASS->Text, 8, writer);
+		//誕生日を16バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxBirthYear->Text + "年" + this->textBoxBirthMonth->Text + "月" + this->textBoxBirthDay->Text + "日", 16, writer);
+		//電話番号を16バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16, writer);
+		//住所を80バイト分書き出す
+		judge[index++] = this->SetByte(this->textBoxAdress->Text, 80, writer);
+		//属性をビットとして書き出す
+		judge[index++] = this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxElement->SelectedIndex)), 1, writer);
+		//権限をビットとして書き出す
+		judge[index++] = this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxAdmin->SelectedIndex)), 1, writer);
+		//職種をビットとして書き出す
+		judge[index++] = this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxOccupations->SelectedIndex)), 1, writer);
+		//部署をビットとして書き出す
+		judge[index++] = this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxDepart->SelectedIndex)), 1, writer);
+		//役職をビットとして書き出す
+		judge[index++] = this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxPosition->SelectedIndex)), 12, writer);
+		//入力を終了する
+		writer->Close();
+		//途中で不正が出ていないか走査する
+		for (int i = 0; i < CONSTANTGROUP::BLOCK_COUNT; i++) {
+			//不正が出ている箇所をチェックする
+			if (judge[i] == false) {
+				//不正があった場合はその旨を表示する
+				MessageBox::Show("入力情報が不正です。\n確認してください。");
+				//処理を中断する
+				return;
+			}
+		}
+		//ダイアログを閉じる
+		this->Close();
+	}
+	catch (System::Exception^ e) {
+		//エラーが発生した旨を表示する
+		MessageBox::Show(Constants->ERROR_MESSAGE);
+		//コンソールにエラー内容を表示する
+		Console::WriteLine(e);
+	}
 }
 
-private:System::String^ SetByte(String^ data, Int32 setbyte) {
-	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");
-	Int32 bytecount = e->GetByteCount(data);
-	if (bytecount <= setbyte) {
+public:System::Boolean SetByte(String^ data, Int32 setbyte, System::IO::StreamWriter^ writer) {
+	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
+	Int32 bytecount = e->GetByteCount(data);    //受け取った文字列をを"shift_jis"としてバイト数をカウントする
+	Boolean judge = true;                       //文字列に不正がなく書き込めたかの判定
+	//文字列のバイト数が指定のバイト数を超えていないかのチェック
+	if (bytecount <= setbyte && data != "") {
+		//文字列を走査して加工する
 		for (; bytecount < setbyte; bytecount++) {
+			//指定のバイト数分空白文字で埋めていく
 			data += " ";
 		}
+		//加工の終えた文字列をファイルに書き込む
+		writer->Write(data);
 	}
+	//超えているときはエラーを投げる
 	else {
-		throw gcnew System::Exception(Constants->OVER_ERROR_MESSAGE);
+		//文字列に不正があった場合はfalseを返す
+		judge = false;
 	}
-	return data;
+	//加工し終えた文字列を返却する
+	return judge;
 }
+
+	   public:System::String^ SetByte(String^ data, Int32 setbyte) {
+		   System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
+		   Int32 bytecount = e->GetByteCount(data);    //受け取った文字列をを"shift_jis"としてバイト数をカウントする
+		   //文字列のバイト数が指定のバイト数を超えていないかのチェック
+		   if (bytecount <= setbyte && data != "") {
+			   //文字列を走査して加工する
+			   for (; bytecount < setbyte; bytecount++) {
+				   //指定のバイト数分空白文字で埋めていく
+				   data += " ";
+			   }
+		   }
+		   //超えているときはエラーを投げる
+		   else {
+			   //文字列に不正があった場合はエラーを返す
+			   throw gcnew System::Exception(Constants->OVER_ERROR_MESSAGE);
+		   }
+		   //加工し終えた文字列を返却する
+		   return data;
+	   }
+
 private: System::Void buttonCancel_Click(System::Object^  sender, System::EventArgs^  e) {
+	//何も行わずにダイアログを閉じる
 	this->Close();
 }
 };
