@@ -262,6 +262,11 @@ public:
 		return;
 	}
 
+	/*概要:入館日の取得及び年月の確認を行う関数
+	引数:string uid:チェック対象のユーザのID
+	戻り値:なし
+	作成日：2017.10.11
+	作成者:K.Asada*/
 	void SetEnterTimes(std::string uid) {
 		ITOC times;
 		char getdata[BLOCK_COUNT * 16];
@@ -283,6 +288,11 @@ public:
 		return;
 	}
 
+	/*概要:退館日の取得及び年月の確認を行う関数
+	引数:string uid:チェック対象のユーザのID
+	戻り値:なし
+	作成日：2017.10.11
+	作成者:K.Asada*/
 	void SetLeaveTimes(std::string uid) {
 		ITOC times;
 		char getdata[BLOCK_COUNT * 16];

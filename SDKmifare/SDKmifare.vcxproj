@@ -29,6 +29,7 @@
     <ClCompile Include="InputNewUserForm.cpp" />
     <ClCompile Include="PassForm.cpp" />
     <ClCompile Include="SDKmifare.cpp" />
+    <ClCompile Include="TimeCardForm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdmissionSystem.h" />
@@ -43,6 +44,9 @@
     <ClInclude Include="SDKmifare.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="TimeCardForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="InputNewUserForm.resx">
@@ -53,6 +57,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SDKmifare.resx">
       <DependentUpon>SDKmifare.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TimeCardForm.resx">
+      <DependentUpon>TimeCardForm.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup Label="Globals">

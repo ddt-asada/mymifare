@@ -8,38 +8,7 @@
 作成日:2017.10.10
 作成者:K.Asada*/
 namespace CONSTANTGROUP {
-	public ref class ConstantString {
-	public:
-		ConstantString() {
-
-		}
-
-		//新規作成時に表示されるメッセージ
-		static System::String^ NEW_MESSAGE = "新規で作成します。\n情報を入力してください。";
-		//カードをかざす指示のメッセージ
-		static System::String^ SET_CARD_MESSAGE = "カードをかざしてください";
-		//作成完了時のメッセージ
-		static System::String^ FINISH_MESSAGE = "カードが作成されました";
-		//操作キャンセル時のメッセージ
-		static System::String^ CANCEL_MESSAGE = "操作が中断されました。";
-		//退館時のメッセージ
-		static System::String^ LEAVE_MESSAGE = "退館しました。";
-		//入館時のメッセージ
-		static System::String^ ENTER_MESSAGE = "入館しました。";
-		//例外発生時のメッセージ
-		static System::String^ ERROR_MESSAGE = "エラーが発生しました。";
-		//スマートカードサービスが動いていない時のメッセージ
-		static System::String^ NO_SERVICE_ERROR = "スマートカードサービスが稼働していません。";
-		//カードが設置されていないときのメッセージ
-		static System::String^ REMOVE_ERROR = "カードが検知できません。";
-		//ユーザーIDが登録されていないときのメッセージ
-		static System::String^ ID_NOT_FOUND_ERROR = "対象のIDが見つかりません。";
-		//パスワードが間違っているときのときのメッセージ
-		static System::String^ PASS_NOT_FOUND_ERROR = "パスワードが違います。";
-		//入力された文字数が既定の文字数を超えているときのメッセージ
-		static System::String^ OVER_ERROR_MESSAGE = "文字数制限を超えています。\n入力しなおしてください。";
-	};
-		//送信コマンド用構造体
+	//送信コマンド用構造体
 		typedef struct send{
 			int           sendLength;
 			unsigned char sendCommand[PCSC_TRANS_BUFF_LEN];
@@ -154,4 +123,80 @@ namespace CONSTANTGROUP {
 	static const SENDCOMM SENDCARD = { 21,{ 0xFF,0xD6,0x00,BEGIN_BLOCK,0x10 } };
 	//送信コマンドの終わりをしめすコマンド
 	static const SENDCOMM ENDCOMMAND = { -1, NULL };
+
+	public ref class ConstantString {
+	public:
+		ConstantString() {
+
+		}
+
+		//新規作成時に表示されるメッセージ
+		static System::String^ NEW_MESSAGE = "新規で作成します。\n情報を入力してください。";
+		//カードをかざす指示のメッセージ
+		static System::String^ SET_CARD_MESSAGE = "カードをかざしてください";
+		//作成完了時のメッセージ
+		static System::String^ FINISH_MESSAGE = "カードが作成されました";
+		//操作キャンセル時のメッセージ
+		static System::String^ CANCEL_MESSAGE = "操作が中断されました。";
+		//退館時のメッセージ
+		static System::String^ LEAVE_MESSAGE = "退館しました。";
+		//入館時のメッセージ
+		static System::String^ ENTER_MESSAGE = "入館しました。";
+		//既に入館済みの場合に表示するメッセージ
+		static System::String^ ALREADY_ENTER_MESSAGE = "既に入館済みです。";
+		//入館していないときに表示するメッセージ
+		static System::String^ NOT_ENTER_MESSAGE = "入館中のユーザーがいません。";
+		//例外発生時のメッセージ
+		static System::String^ ERROR_MESSAGE = "エラーが発生しました。";
+		//スマートカードサービスが動いていない時のメッセージ
+		static System::String^ NO_SERVICE_ERROR = "スマートカードサービスが稼働していません。";
+		//カードが設置されていないときのメッセージ
+		static System::String^ REMOVE_ERROR = "カードが検知できません。";
+		//ユーザーIDが登録されていないときのメッセージ
+		static System::String^ ID_NOT_FOUND_ERROR = "対象のIDが見つかりません。";
+		//パスワードが間違っているときのときのメッセージ
+		static System::String^ PASS_NOT_FOUND_ERROR = "パスワードが違います。";
+		//入力された文字数が既定の文字数を超えているときのメッセージ
+		static System::String^ OVER_ERROR_MESSAGE = "文字数制限を超えています。\n入力しなおしてください。";
+		//ユーザーIDが入力されていないときに表示するメッセージ
+		static System::String^ EMPTY_ERROR_MESSAGE = "入力されていない場所があります。\n入力しなおしてください。";
+		//ユーザーIDが未入力の時に表示するメッセージ
+		static System::String^ IDEMPTY_ERROR_MESSAGE = "ユーザーIDが未入力です。\n確認してください。";
+		//属性の1ビット目の名前
+		static System::String^ CLI_ELEM_NAME1 = gcnew System::String(ELEM_NAME1);
+		//属性の2ビット目の名前
+		static System::String^ CLI_ELEM_NAME2 = gcnew System::String(ELEM_NAME2);
+		//属性の3ビット目の名前
+		static System::String^ CLI_ELEM_NAME3 = gcnew System::String(ELEM_NAME3);
+		//属性の4ビット目の名前
+		static System::String^ CLI_ELEM_NAME4 = gcnew System::String(ELEM_NAME4);
+		//権限の1ビット目の名前
+		static System::String^ CLI_ADM_NAME1 = gcnew System::String(ADM_NAME1);
+		//権限の2ビット目の名前
+		static System::String^ CLI_ADM_NAME2 = gcnew System::String(ADM_NAME2);
+		//職種の1ビット目の名前
+		static System::String^ CLI_OCCUP_NAME1 = gcnew System::String(OCCUP_NAME1);
+		//職種の2ビット目の名前
+		static System::String^ CLI_OCCUP_NAME2 = gcnew System::String(OCCUP_NAME2);
+		//職種の3ビット目の名前
+		static System::String^ CLI_OCCUP_NAME3 = gcnew System::String(OCCUP_NAME3);
+		//職種の4ビット目の名前
+		static System::String^ CLI_OCCUP_NAME4 = gcnew System::String(OCCUP_NAME4);
+		//部署の1ビット目の名前
+		static System::String^ CLI_DEPART_NAME1 = gcnew System::String(DEPART_NAME1);
+		//部署の2ビット目の名前
+		static System::String^ CLI_DEPART_NAME2 = gcnew System::String(DEPART_NAME2);
+		//部署の3ビット目の名前
+		static System::String^ CLI_DEPART_NAME3 = gcnew System::String(DEPART_NAME3);
+		//部署の4ビット目の名前
+		static System::String^ CLI_DEPART_NAME4 = gcnew System::String(DEPART_NAME4);
+		//役職の1ビット目の名前
+		static System::String^ CLI_POS_NAME1 = gcnew System::String(POS_NAME1);
+		//役職の2ビット目の名前
+		static System::String^ CLI_POS_NAME2 = gcnew System::String(POS_NAME2);
+		//役職の3ビット目の名前
+		static System::String^ CLI_POS_NAME3 = gcnew System::String(POS_NAME3);
+		//役職の4ビット目の名前
+		static System::String^ CLI_POS_NAME4 = gcnew System::String(POS_NAME4);
+	};
 }

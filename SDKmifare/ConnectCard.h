@@ -128,6 +128,15 @@ public:
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		DWORD ActiveProtocol = 0; //プロトコル
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
+		readerstate.szReader = PASORI_NAME;
+		readerstate.dwCurrentState = SCARD_STATE_UNAWARE;
+		lResult = SCardGetStatusChange(hContext, 0, &readerstate, 1);
+		if (readerstate.dwEventState & SCARD_STATE_EMPTY) {
+			readerstate.dwCurrentState = readerstate.dwEventState;
+			if (SCardGetStatusChange(hContext, 10000, &readerstate, 1) != 0) {
+				throw gcnew System::Exception(Constants->REMOVE_ERROR);
+			}
+		}
 		//カードとの接続を開始する
 		lResult = ::SCardConnect(hContext, PASORI_NAME, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &ActiveProtocol);
 		//接続結果が失敗なら例外を投げる
