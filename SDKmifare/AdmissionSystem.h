@@ -30,7 +30,7 @@ public:
 	std::string CheckUser(std::vector<std::vector<unsigned char>> data, std::string pass) {
 		std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
-		uid = GetData(data, UID_INDEX, 0, 8);
+		uid = GetData(data, UID_INDEX);
 		//取得したユーザー名でファイルを開く
 		std::ifstream ifs(uid);
 		//ユーザーIDをファイル名としたファイルが開けないときはユーザーが存在していないとして例外を投げる
@@ -56,7 +56,7 @@ public:
 	bool CheckPass(std::vector<std::vector<unsigned char>> data, std::string pass) {
 		std::string getpass = "";        //ファイルより取得したパスを格納するための文字列
 		//受信したカードデータより情報を取得する関数を呼び出す
-		getpass = GetData(data, PASS_INDEX, 8, 16);
+		getpass = GetData(data, PASS_INDEX);
 		//パスが違ったら例外を投げる
 		if (getpass != pass) {
 			//パスワードが違う旨を表示する
@@ -153,11 +153,49 @@ public:
 	戻り値:なし
 	作成日:2017.10.10
 	作成者:K.Asada*/
-	void SetCardData(std::string uid) {
+	void SetCardData(std::string pass) {
 		try {
 			ConnectCard* con = new ConnectCard();    //カード通信クラスをインスタンス化
 			std::vector<SENDCOMM> senddata;    //送信コマンドを格納するための構造体
+			std::vector<std::vector<unsigned char>> recvdata;    //受信データを格納するための配列
+			std::string uid;
+			//受信コマンドを組み立てる関数を呼び出す
+			senddata = ReadyGetData(BEGIN_BLOCK);
+			//受信コマンドをカードへ送信してデータを受け取る
+			recvdata = con->LinkCard(senddata);
+			//ユーザー情報を確認する関数を呼び出す
+			uid = CheckUser(recvdata, pass);
+			if (!CheckLeave(recvdata)) {
+				System::Windows::Forms::MessageBox::Show("このユーザーは入館していません。");
+				throw gcnew System::Exception("このユーザは入館していません。");
+			}
+			//退館日を記録する
+			SetLeaveTimes(uid);
 			//送信コマンドを作成する関数を呼び出す
+			senddata = ReadySetData(uid, BEGIN_BLOCK);
+			//送信コマンドの終わりにコマンドの終わりを示すコマンドを格納する
+			senddata.push_back(ENDCOMMAND);
+			//カードへコマンドを送信する関数を呼び出す
+			con->LinkCard(senddata);
+			return;
+		}
+		catch (System::Exception^ e) {
+			System::Console::WriteLine(e);
+			throw e;
+		}
+	}
+
+	/*概要:カードへ新規でデータを送信するための関数
+	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
+	:SCARDHANDLE hCard:取得したカード
+	:string uid:取得したカードのユーザーID
+	戻り値:なし
+	作成日:2017.10.10
+	作成者:K.Asada*/
+	void SetNewCardData(std::string uid) {
+		try {
+			ConnectCard* con = new ConnectCard();    //カード通信クラスをインスタンス化
+			std::vector<SENDCOMM> senddata;    //送信コマンドを格納するための構造体
 			senddata = ReadySetData(uid, BEGIN_BLOCK);
 			//送信コマンドの終わりにコマンドの終わりを示すコマンドを格納する
 			senddata.push_back(ENDCOMMAND);
@@ -189,6 +227,10 @@ public:
 			recvdata = con->LinkCard(sendcomm);
 			//ユーザー情報を確認する関数を呼び出す
 			uid = CheckUser(recvdata, pass);
+			if (!CheckEnter(recvdata)) {
+				System::Windows::Forms::MessageBox::Show("このユーザーは退館していません。");
+				throw gcnew System::Exception("このユーザは退館していません。");
+			}
 			//入館時間を取得する関数を呼び出す
 			SetEnterTimes(uid);
 			//入館時間をカードに記録させるためのコマンドを作成する
@@ -199,8 +241,9 @@ public:
 			recvdata = con->LinkCard(sendcomm);
 			return recvdata;
 		}
-		catch (System::IndexOutOfRangeException^ e) {
+		catch (System::Exception^ e) {
 			System::Console::WriteLine(e);
+			throw e;
 		}
 	}
 
@@ -278,8 +321,8 @@ public:
 			if (getdata[i] == ' ') {
 				getdata[i] = times.bytes[1];
 				getdata[i + 1] = times.bytes[0];
-				std::ofstream ofs(uid);
-				ofs << getdata;
+				std::ofstream ofs(uid, std::ios::binary);
+				ofs.write(getdata, 16 * BLOCK_COUNT);
 				ofs.close();
 				break;
 			}
@@ -300,12 +343,12 @@ public:
 		times.num = GetAdmissionTime();
 		std::ifstream ifs(uid);
 		ifs.get(getdata, BLOCK_COUNT * 16);
-		for (int i = LEAVE_1_INDEX * 16; i < (LEAVE_4_INDEX + 1) * 16; i++) {
+		for (int i = LEAVE_1_INDEX * 16 + 2; i < (LEAVE_4_INDEX + 1) * 16; i++) {
 			if (getdata[i] == ' ') {
 				getdata[i] = times.bytes[1];
 				getdata[i + 1] = times.bytes[0];
-				std::ofstream ofs(uid);
-				ofs << getdata;
+				std::ofstream ofs(uid, std::ios::binary);
+				ofs.write(getdata, 16 * BLOCK_COUNT);
 				ofs.close();
 				break;
 			}
@@ -341,32 +384,32 @@ public:
 		char filedata[16 * BLOCK_COUNT] = { '\0' };  //ファイルから取得したデータを格納する変数
 		int yearindex = 16 * YEAR_INDEX;             //カードデータの中の年月が格納されている場所
 		//現在年月を取得する
-		years.num = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
-		//ファイルから年月を取得するためのストリームを開く
-		std::ifstream ifs(uid);
-		//ファイルからデータを取得する
-		ifs.getline(filedata, 16*BLOCK_COUNT);
-		//データから年月情報を取り出し、取得した年月と比較する
-		if (years.bytes[1] != filedata[yearindex] || years.bytes[0] != filedata[yearindex + 1]) {
-			//ファイルから取得した年月を上書きする
-			filedata[yearindex++] = years.bytes[1];
-			//年月を上書きする
-			filedata[yearindex++] = years.bytes[0];
-			//年月の後に格納されている日時分を削除する
-			for (int i = yearindex; i < sizeof(filedata); i++) {
-				//1バイトずつ'\0'に置き換えていく
-				filedata[i] = ' ';
-			}
-			//書き込み用のファイルストリームを開く
-			std::ofstream ofs(uid);
-			//上書きしたデータをファイルに書き出す
-			ofs << filedata;
-			//書き込み用のファイルストリームを閉じる
-			ofs.close();
-		}
-		//開いたファイルストリームを閉じる
-		ifs.close();
-		return;
+years.num = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
+//ファイルから年月を取得するためのストリームを開く
+std::ifstream ifs(uid);
+//ファイルからデータを取得する
+ifs.getline(filedata, 16 * BLOCK_COUNT);
+//開いたファイルストリームを閉じる
+ifs.close();
+//データから年月情報を取り出し、取得した年月と比較する
+if (years.bytes[1] != filedata[yearindex] || years.bytes[0] != filedata[yearindex + 1]) {
+	//ファイルから取得した年月を上書きする
+	filedata[yearindex++] = years.bytes[1];
+	//年月を上書きする
+	filedata[yearindex++] = years.bytes[0];
+	//年月の後に格納されている日時分を削除する
+	for (int i = yearindex; i < sizeof(filedata); i++) {
+		//1バイトずつ'\0'に置き換えていく
+		filedata[i] = ' ';
+	}
+	//書き込み用のファイルストリームを開く
+	std::ofstream ofs(uid, std::ios::binary);
+	//上書きしたデータをファイルに書き出す
+	ofs.write(filedata, 16 * BLOCK_COUNT);
+	//書き込み用のファイルストリームを閉じる
+	ofs.close();
+}
+return;
 	}
 
 	/*概要:コマンドの初期化処理関数
@@ -386,4 +429,86 @@ public:
 		//組み立てたコマンドを返却する
 		return initcommand;
 	}
+
+	/*概要:カードに格納された日時分情報を文字列に変換する関数
+	引数:std::vector<std::vcotr<unsigned char>> data:カードデータ
+	戻り値:std::vector<string> times:日時分を文字列に変換した配列
+	作成日:2017.10.16
+	作成者:K.Asada*/
+ std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data, int index) {
+	try {
+		std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
+		ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
+		int day = 0;                           //取得した日を格納する変数
+		int hour = 0;                          //取得した時間を格納する変数
+		int min = 0;                           //取得した分を格納する変数
+		int timeindex = index;
+		//カードデータにある日時分情報を走査していく
+		for (int i = 1; data[timeindex][i * 2] != ' ' && data[timeindex][i *2] != '\0'; i++) {
+			//カードデータより日時分の上位8ビットを取得する
+			gettimes.bytes[1] = data[timeindex][i * 2];
+			//カードデータより日時分の下位8ビットを取得する
+			gettimes.bytes[0] = data[timeindex][i * 2 + 1];
+			//取得した日時分を日に変換する
+			day = gettimes.num / 1440;
+			//取得した日時分を時に変換する
+			hour = gettimes.num / 60 - day * 24;
+			//取得した日時分を分に変換する
+			min = gettimes.num - 1440 * day - 60 * hour;
+			//変換した日時分を連結して文字列を完成させる
+			times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n');
+			if (i == 7) {
+				i = -1;
+				timeindex++;
+			}
+		}
+		//変換した文字列を返却する
+		return times;
+	}
+	catch (System::IndexOutOfRangeException^ e) {
+		System::Console::WriteLine(e);
+	}
+}
+
+		 /*概要:ユーザーが入館状態かどうかをチェックするための関数
+		 引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+		 戻り値:bool judge:判定結果
+		 作成日:2017.10.19
+		 作成者:K.Asada*/
+		 bool CheckEnter(std::vector<std::vector<unsigned char>> data) {
+			 std::vector<std::string> entertimes;    //入館時間を格納する文字列
+			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
+			 bool judge = true;                      //判定結果を格納する
+			 //入館時間を取得する
+			 entertimes = ConvTimes(data, TIMES_1_INDEX);
+			 //退館時間を取得する
+			 leavetimes = ConvTimes(data, LEAVE_1_INDEX);
+			 //入館状態かどうかの判定を行う
+			 if (entertimes.size() > leavetimes.size()){
+				 //入館状態である判定を返す
+				 judge = false;
+			 }
+			 return judge;
+		}
+
+		 /*概要:ユーザーが入館状態かどうかをチェックするための関数
+		 引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+		 戻り値:bool judge:判定結果
+		 作成日:2017.10.19
+		 作成者:K.Asada*/
+		 bool CheckLeave(std::vector<std::vector<unsigned char>> data) {
+			 std::vector<std::string> entertimes;    //入館時間を格納する文字列
+			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
+			 bool judge = true;                      //判定結果を格納する
+													 //入館時間を取得する
+			 entertimes = ConvTimes(data, TIMES_1_INDEX);
+			 //退館時間を取得する
+			 leavetimes = ConvTimes(data, LEAVE_1_INDEX);
+			 //入館状態かどうかの判定を行う
+			 if (entertimes.size() <= leavetimes.size()) {
+				 //入館状態である判定を返す
+				 judge = false;
+			 }
+			 return judge;
+		 }
 };

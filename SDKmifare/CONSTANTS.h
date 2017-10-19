@@ -19,98 +19,105 @@ namespace CONSTANTGROUP {
 			char bytes[sizeof(unsigned short int)];
 		};
 
+		union TOC {
+			unsigned int num;
+			char bytes[sizeof(unsigned int)];
+		};
+
 		//書き込みの始点となるブロック
 		static const int BEGIN_BLOCK = 8;
 		//書き込みの終点となるブロック
-		static const int END_BLOCK = 33;
+		static const int END_BLOCK = 36;
 		//書き込むブロックの数
 		static const int BLOCK_COUNT = END_BLOCK - BEGIN_BLOCK;
 		//ユーザー名が格納されているブロック番号
-		static const int NAME_INDEX = 0;
+		static const int NAME_INDEX = 1;
 		//ユーザーフリガナが格納されているブロック番号
-		static const int KANA_INDEX = 1;
+		static const int KANA_INDEX = 2;
 		//ユーザーIDが格納されているブロック番号
-		static const int UID_INDEX = 2;
+		static const int UID_INDEX = 0;
 		//パスワードが格納されているブロック番号
-		static const int PASS_INDEX = 2;
+		static const int PASS_INDEX = 3;
 		//属性が格納されているブロック番号
-		static const int ELEM_INDEX = 10;
+		static const int ELEM_INDEX = 5;
 		//権限が格納されているブロック番号
-		static const int ADM_INDEX = 10;
+		static const int ADM_INDEX = 5;
 		//職種が格納されているブロック番号
-		static const int OCCUP_INDEX = 10;
+		static const int OCCUP_INDEX = 5;
 		//部署が格納されているブロック番号
-		static const int DEPART_INDEX = 10;
+		static const int DEPART_INDEX = 5;
 		//役職が格納されているブロック番号
-		static const int POS_INDEX = 10;
+		static const int POS_INDEX = 5;
 		//住所が格納されているブロック番号
-		static const int ADRESS_1_INDEX = 5;
+		static const int ADRESS_1_INDEX = 6;
 		//住所が格納されているブロック番号
-		static const int ADRESS_2_INDEX = 6;
+		static const int ADRESS_2_INDEX = 7;
 		//住所が格納されているブロック番号
-		static const int ADRESS_3_INDEX = 7;
+		static const int ADRESS_3_INDEX = 8;
 		//住所が格納されているブロック番号
-		static const int ADRESS_4_INDEX = 8;
+		static const int ADRESS_4_INDEX = 9;
 		//住所が格納されているブロック番号
-		static const int ADRESS_5_INDEX = 9;
+		static const int ADRESS_5_INDEX = 10;
+		//住所が格納されているブロック番号
+		static const int ADRESS_6_INDEX = 11;
 		//電話番号が格納されているブロック番号
 		static const int TELL_INDEX = 4;
 		//誕生日が格納されているブロック番号
-		static const int BIRTH_INDEX = 3;
+		static const int BIRTH_INDEX = 5;
 		//年月が格納されているブロック番号
-		static const int YEAR_INDEX = 11;
+		static const int YEAR_INDEX = 12;
 		//入退館日が格納されているブロック番号
-		static 	const int TIMES_1_INDEX = 11;
+		static 	const int TIMES_1_INDEX = 12;
 		//入退館日が格納されているブロック番号
-		static const int TIMES_2_INDEX = 12;
+		static const int TIMES_2_INDEX = 13;
 		//入退館日が格納されているブロック番号
-		static 	const int TIMES_3_INDEX = 13;
+		static const int TIMES_3_INDEX = 14;
 		//入退館日が格納されているブロック番号
-		static const int TIMES_4_INDEX = 14;
+		static const int TIMES_4_INDEX = 15;
 		//入退館日が格納されているブロック番号
-		static 	const int LEAVE_1_INDEX = 15;
+		static 	const int LEAVE_1_INDEX = 18;
 		//入退館日が格納されているブロック番号
-		static const int LEAVE_2_INDEX = 16;
+		static const int LEAVE_2_INDEX = 19;
 		//入退館日が格納されているブロック番号
-		static const int LEAVE_3_INDEX = 17;
+		static const int LEAVE_3_INDEX = 20;
 		//入退館日が格納されているブロック番号
-		static const int LEAVE_4_INDEX = 18;
+		static const int LEAVE_4_INDEX = 21;
 		//属性の1ビット目の名前
-		static const char* ELEM_NAME1 = "一般人";
+		static const char* ELEM_NAME1 = "一般";
 		//属性の2ビット目の名前
-		static const char* ELEM_NAME2 = "管理者";
+		static const char* ELEM_NAME2 = "要注意人物";
 		//属性の3ビット目の名前
-		static const char* ELEM_NAME3 = "要注意人物";
+		static const char* ELEM_NAME3 = "危険人物";
 		//属性の4ビット目の名前
-		static const char* ELEM_NAME4 = "危険人物";
+		static const char* ELEM_NAME4 = "";
 		//権限の1ビット目の名前
 		static const char* ADM_NAME1 = "一般";
 		//権限の2ビット目の名前
 		static const char* ADM_NAME2 = "管理者";
 		//職種の1ビット目の名前
-		static const char* OCCUP_NAME1 = "営業";
+		static const char* OCCUP_NAME1 = "第一グループ";
 		//職種の2ビット目の名前
-		static const char* OCCUP_NAME2 = "総務";
+		static const char* OCCUP_NAME2 = "第二グループ";
 		//職種の3ビット目の名前
-		static const char* OCCUP_NAME3 = "事務";
+		static const char* OCCUP_NAME3 = "第三グループ";
 		//職種の4ビット目の名前
-		static const char* OCCUP_NAME4 = "PG";
+		static const char* OCCUP_NAME4 = "";
 		//部署の1ビット目の名前
 		static const char* DEPART_NAME1 = "営業部";
 		//部署の2ビット目の名前
 		static const char* DEPART_NAME2 = "総務部";
 		//部署の3ビット目の名前
-		static const char* DEPART_NAME3 = "経理部";
+		static const char* DEPART_NAME3 = "開発部";
 		//部署の4ビット目の名前
-		static const char* DEPART_NAME4 = "開発部";
+		static const char* DEPART_NAME4 = "";
 		//役職の1ビット目の名前
-		static const char* POS_NAME1 = "パート";
+		static const char* POS_NAME1 = "正社員";
 		//役職の2ビット目の名前
-		static const char* POS_NAME2 = "研修";
+		static const char* POS_NAME2 = "パート";
 		//役職の3ビット目の名前
-		static const char* POS_NAME3 = "一般社員";
+		static const char* POS_NAME3 = "部長";
 		//役職の4ビット目の名前
-		static const char* POS_NAME4 = "部長";
+		static const char* POS_NAME4 = "";
 	static const SENDCOMM LOADKEY = { 11,{ 0xFF,0x82,0x00,0x00,0x06,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } };
 	//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
 	// General Authenticate

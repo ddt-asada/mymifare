@@ -202,7 +202,7 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 			//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
 			MessageBox::Show(Constants->SET_CARD_MESSAGE);
 			//カードからデータを取得する関数を呼び出す
-			adm->SetCardData(id);
+			adm->SetNewCardData(id);
 			//作成完了のメッセージを表示する
 			MessageBox::Show(Constants->FINISH_MESSAGE);
 		}//OK以外の時は作成が中断されたとする
@@ -230,23 +230,18 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 作成者：K.Asada*/
 private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventArgs^  e) {
 	try {
-		//入館していない場合は例外を投げる
-		if (this->carddata->empty()) {
-			//入館していない旨を表示する
-			MessageBox::Show(Constants->NOT_ENTER_MESSAGE);
-			//入館していない例外を投げる
-			throw gcnew System::Exception(Constants->NOT_ENTER_MESSAGE);
-		}
+		InputNewUserForm^ create = gcnew InputNewUserForm();
 		AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
-		std::string uid = "";
-		//カードデータよりユーザIDを取得する
-		uid = adm->GetData(*this->carddata, UID_INDEX, 0, 8);
-    	//退館日を記録する
-		adm->SetLeaveTimes(uid);
-		//カード待ち状態を示すダイアログを表示して、キャンセルが押されたら接続を終了する
+		PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
+		std::string passtring = "";                      //パスワードを格納するための文字列
+		//パスワード入力画面に移行する
+		pass->ShowDialog();
+		//受け取ったパスを変換するStringからstringへ
+		this->MarshalString(create->SetByte(pass->textBox1->Text, 16), passtring);
+		//メッセージを表示する
 		MessageBox::Show(Constants->SET_CARD_MESSAGE);
 		//カードからデータを取得する関数を呼び出す
-		adm->SetCardData(uid);
+		adm->SetCardData(passtring);
 		//ユーザー情報ラベルを初期化する
 		this->labelInfomasion->Text = "";
 		//属性ラベルを初期化する
@@ -271,13 +266,6 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 作成者:K.Asada*/
 private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs^  e) {
 	try {
-		//既に入館済みの場合はエラーを投げる
-		if (!this->carddata->empty()) {
-			//入館済みであることを表示する
-			MessageBox::Show(Constants->ALREADY_ENTER_MESSAGE);
-			//入館済みであるエラーを投げる
-			throw gcnew System::Exception(Constants->ALREADY_ENTER_MESSAGE);
-		}
 		InputNewUserForm^ create = gcnew InputNewUserForm();
 		AdmissionSystem* adm = new AdmissionSystem();    //カードとの接続を行ったりするクラスをインスタンス化
 		PassForm^ pass = gcnew PassForm();               //パスワードを入力するフォームをインスタンス化
@@ -285,7 +273,7 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		//パスワード入力画面に移行する
 		pass->ShowDialog();
 		//受け取ったパスを変換するStringからstringへ
-		this->MarshalString(create->SetByte(pass->textBox1->Text, 8), passtring);
+		this->MarshalString(create->SetByte(pass->textBox1->Text, 16), passtring);
 		//メッセージを表示する
 		MessageBox::Show(Constants->SET_CARD_MESSAGE);
 		//カードデータを受信する関数を呼び出す
@@ -310,6 +298,7 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 作成者:K.Asada*/
 private: System::Void CreateDisp() {
 	try {
+		std::vector<std::vector<unsigned char>> data = *this->carddata;
 		std::string tmp = "";
 		std::string showdata = "";            //カードより取得した文字列を格納する
 		AdmissionSystem* adm = new AdmissionSystem();    //カードよりデータを取得するためのクラスをインスタンス化
@@ -330,26 +319,24 @@ private: System::Void CreateDisp() {
 		//カードデータより電話番号を示す文字列を取得する
 		showdata += "電話番号：" + adm->GetData(*this->carddata, TELL_INDEX) + '\n';
 		//カードデータより誕生日を示す文字列を取得する
-		showdata += "誕 生  日：" + adm->GetData(*this->carddata, BIRTH_INDEX) + '\n';
+		showdata += "誕 生  日：" + this->ConvBirth(data[BIRTH_INDEX]) + '\n';
 		//カードデータより属性を示す文字列を取得する
-		tmp = this->GetElem(ELEM_INDEX, 0, ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4);
-		if (tmp == ELEM_NAME3) {
+		tmp = this->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4);
+		if (tmp == ELEM_NAME2) {
 			this->label1->Text = gcnew String(tmp.c_str());
 			this->label1->Visible = true;
 		}
-		else if (tmp == ELEM_NAME4) {
+		else if (tmp == ELEM_NAME3) {
 			MessageBox::Show("危険人物です入館を拒否します。");
 			throw gcnew System::Exception("危険人物です。");
 		}
 		showdata += "属　　　性：" + tmp + '\n';
 		//カードデータ　　　より権限を示す文字列を取得する
-		showdata += "権　　　限：" + this->GetElem(ADM_INDEX, 1, ADM_NAME1, ADM_NAME2, "", "") + '\n';
-		//カードデータより職種を示す文字列を取得する
-		showdata += "職　　　種：" + this->GetElem(OCCUP_INDEX, 2, OCCUP_NAME1, OCCUP_NAME2, OCCUP_NAME3, OCCUP_NAME4) + '\n';
-		//カードデータより部署を示す文字列を取得する
-		showdata += "部　　　署：" + this->GetElem(DEPART_INDEX, 3, DEPART_NAME1, DEPART_NAME2, DEPART_NAME3, DEPART_NAME4) + '\n';
+		showdata += "権　　　限：" + this->GetElem(data[ADM_INDEX][5], ADM_NAME1, ADM_NAME2, "", "") + '\n';
 		//カードデータより役職を示す文字列を取得する
-		showdata += "役　　　職：" + this->GetElem(POS_INDEX, 4, POS_NAME1, POS_NAME2, POS_NAME3, POS_NAME4) + '\n';
+		showdata += "役　　　職：" + this->GetElem(data[POS_INDEX][6], POS_NAME1, POS_NAME2, POS_NAME3, POS_NAME4) + '\n';
+		showdata += "グループ：" + this->GetElem(data[DEPART_INDEX][7] >> 4, "", OCCUP_NAME1, OCCUP_NAME2, OCCUP_NAME3) + '\n';
+		showdata += "所　　　属：" + this->GetElem(data[DEPART_INDEX][7], "", DEPART_NAME1, DEPART_NAME2, DEPART_NAME3) + '\n';
 		//メイン画面へ文字列を反映する
 		this->labelInfomasion->Text = gcnew String(showdata.c_str());
 		return;
@@ -382,34 +369,31 @@ private: System::Int32 CheckBit(char check) {
 }
 
 		 /*概要:何ビット目がたっているかに応じた文字列を返す関数
-		 引数:int index:カードデータの中の対象のデータが格納されている場所
-		     :int byte:対象が格納されている何バイト目に格納されているか
-			 :string name1:1ビット目がたっているときに返す文字列
+		 引数:string name1:1ビット目がたっているときに返す文字列
 			 :string name2:2ビット目がたっているときに返す文字列
 			 :string name3:3ビット目がたっているときに返す文字列
 			 :string name4:4ビット目がたっているときに返す文字列
 		戻り値:string name:ビット数に応じた文字列
 		作成日:2017.10.17
 		作成者:K.Asada*/
-		 std::string GetElem(int index, int byte, std::string name1, std::string name2, std::string name3, std::string name4) {
+		 std::string GetElem(unsigned char data, std::string name0, std::string name1, std::string name2, std::string name3) {
 			 std::string name = "";    //返却用の文字列
-			 std::vector<std::vector<unsigned char>> data = *this->carddata;
 			 int checkbit = 0;         //何ビット目がたっていたかを格納する変数
 			 //何ビット目がたっているかを調べる
-			 checkbit = this->CheckBit(data[index][byte]);
+			 checkbit = this->CheckBit(data);
 			 //何ビット目がたっていたかによって対応した文字列を返却する
 			 switch (checkbit) {
 		     //1の時は引数1の文字列を返す
-			 case 1:name = name1;
+			 case 0:name = name0;
 				 break;
 			 //2の時は引数2の文字列を返す
-			 case 2:name = name2;
+			 case 1:name = name1;
 				 break;
 			 //3の時は引数3の文字列を返す
-			 case 3:name = name3;
+			 case 2:name = name2;
 				 break;
 			 //4の時は引数4の文字列を返す
-			 case 4:name = name4;
+			 case 3:name = name3;
 				 break;
 			 }
 			 //取得した文字列を返却する
@@ -430,6 +414,36 @@ private: System::Int32 CheckBit(char check) {
 			 std_string = chars;
 			 Marshal::FreeHGlobal(IntPtr((void*)chars));
 			 return;
+		 }
+
+		 /*概要:カードデータより誕生日を取得するための関数
+		 引数:vector<char> data:カードデータ
+		 戻り値:std::string birth:誕生日を取得して文字列に変換したデータ
+		 作成日:2017.10.19
+		 作成者:K.Asada*/
+		 std::string ConvBirth(std::vector<unsigned char> data) {
+			 TOC condata;    //char型をint型に変換する際に使用するバイト配列
+			 int year = 0;                               //誕生年
+			 int month = 0;                              //誕生月
+			 int day = 0;                                //誕生日
+			 std::string birth;                          //誕生年月日を示す文字列
+			 //カードデータより誕生日を取得する
+			 for (int i = 0; i < 4; i++) {
+				 //1バイトずつ取得していく
+				 condata.bytes[i] = data[i];
+			 }
+			 //バイトからint型に変換する
+			// condata = con;
+			 //誕生年を取得する
+			 year = condata.num / 10000;
+			 //誕生月を取得する
+			 month = condata.num / 100 - year * 100;
+			 //誕生日を取得する
+			 day = condata.num - year * 10000 - month * 100;
+			 //誕生年月日の文字列として組み立てる
+			 birth = std::to_string(year) + "年" + std::to_string(month) + "月" + std::to_string(day) + "日";
+			 //取得した文字列を返却する
+			 return birth;
 		 }
 private: System::Void labelCauntion_Click(System::Object^  sender, System::EventArgs^  e) {
 }

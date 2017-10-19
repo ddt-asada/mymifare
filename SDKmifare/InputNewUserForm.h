@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CONSTANTS.h"
+#include <iostream>
 
 namespace sdkmifare {
 
@@ -545,6 +546,9 @@ namespace sdkmifare {
 		private:CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
+		char tmp = 0;
+		std::string test2;
+		CONSTANTGROUP::TOC itoc;
 		Int32 index = 0;
 		//ユーザーIDをメンバへ保管する
 		this->UID = this->textBoxUID->Text;
@@ -555,30 +559,30 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		}
 		//ファイル入力クラスをインスタンス化
 		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text, false, System::Text::Encoding::GetEncoding("shift_jis"));
+		//ユーザーIDを8バイト分書き出す
+		this->SetByte(this->textBoxUID->Text, 16, writer);
 		//名前(漢字)を16バイト分書き出す
 		this->SetByte(this->textBoxName->Text, 16, writer);
 		//名前(ふりがな)を16バイト分書き出す
 		this->SetByte(this->textBoxNameKana->Text, 16, writer);
-		//ユーザーIDを8バイト分書き出す
-		this->SetByte(this->textBoxUID->Text, 8, writer);
 		//パスワードを8バイト分書き出す
-		this->SetByte(this->textBoxPASS->Text, 8, writer);
-		//誕生日を16バイト分書き出す
-		this->SetByte(Convert::ToString(this->numericUpDown1->Value) + "年" + Convert::ToString(this->numericUpDown2->Value) + "月" + Convert::ToString(this->numericUpDown3->Value) + "日", 16, writer);
+		this->SetByte(this->textBoxPASS->Text, 16, writer);
 		//電話番号を16バイト分書き出す
 		this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16, writer);
-		//住所を80バイト分書き出す
-		this->SetByte(this->textBoxAdress->Text, 80, writer);
+		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown2->Value) * 100 + Convert::ToInt32(this->numericUpDown3->Value);
+		test2 = itoc.bytes;
+		//誕生日を4バイト分書き出す
+		this->SetByte(gcnew String(test2.c_str()), 4, writer);
 		//属性をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxElement->SelectedIndex)), 1, writer);
+		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1, writer);
 		//権限をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxAdmin->SelectedIndex)), 1, writer);
-		//職種をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxOccupations->SelectedIndex)), 1, writer);
-		//部署をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxDepart->SelectedIndex)), 1, writer);
+		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1, writer);
 		//役職をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar(1 << this->comboBoxPosition->SelectedIndex)), 12, writer);
+		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1, writer);
+		//部署をビットとして書き出す
+		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9, writer);
+		//住所を80バイト分書き出す
+		this->SetByte(this->textBoxAdress->Text, 96, writer);
 		//入力を終了する
 		writer->Close();
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "CONSTANTS.h"
+#include "AdmissionSystem.h"
 
 namespace sdkmifare {
 
@@ -113,13 +114,14 @@ namespace sdkmifare {
 		作成日:2017.10.18
 		作成者:K.Asada*/
 		System::Drawing::Bitmap^ CreateTimes(std::vector<std::vector<unsigned char>> data) {
+			AdmissionSystem* adm = new AdmissionSystem();
 			std::vector<std::string> entertimes;    //入館日を格納する文字列
 			std::vector<std::string> leavetimes;    //退館日を格納する文字列
 			int index = 0;    //ループ回数を設定するための変数
 			//カードデータより入館日を取得する
-			entertimes = this->ConvEnterTimes(data);
+			entertimes = adm->ConvTimes(data, TIMES_1_INDEX);
 			//カードデータより退館日を取得する
-			leavetimes = this->ConvLeaveTimes(data);
+			leavetimes = adm->ConvTimes(data, LEAVE_1_INDEX);
 			//入館日の要素数を取得する
 			index = entertimes.size();
 			System::Drawing::Bitmap^ img = gcnew Bitmap(200 * 2 + 1, 50 * index + 1);    //画像用の空のビットマップを作成
