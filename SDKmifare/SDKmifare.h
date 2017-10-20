@@ -122,7 +122,6 @@ namespace sdkmifare {
 			this->labelCauntion->Name = L"labelCauntion";
 			this->labelCauntion->Size = System::Drawing::Size(0, 53);
 			this->labelCauntion->TabIndex = 3;
-			this->labelCauntion->Click += gcnew System::EventHandler(this, &SDKmifare::labelCauntion_Click);
 			// 
 			// labelInfomasion
 			// 
@@ -208,6 +207,7 @@ private: System::Void ButtonNewUserClick(System::Object^  sender, System::EventA
 		}//OK以外の時は作成が中断されたとする
 		else {
 			MessageBox::Show(Constants->CANCEL_MESSAGE);
+			throw gcnew System::Exception(Constants->CANCEL_MESSAGE);
 		}
 		//保存しているユーザーのカードデータを削除する
 		this->carddata->clear();
@@ -250,8 +250,6 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 		this->labelCauntion->Text = Constants->LEAVE_MESSAGE;
 		//保存しているユーザーのカードデータを削除する
 		this->carddata->clear();
-		//退館時のメッセージを表示する
-	//	MessageBox::Show(Constants->LEAVE_MESSAGE);
 		return;
 	}
 	catch (System::Exception^ e) {
@@ -282,8 +280,6 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		this->CreateDisp();
 		//入館状態であることをメイン画面へ表示する
 		this->labelCauntion->Text = Constants->ENTER_MESSAGE;
-		//入館完了のメッセージを表示する
-	//	MessageBox::Show(Constants->ENTER_MESSAGE);
 		return;
 	}
 	catch (System::Exception^ e) {
@@ -303,11 +299,11 @@ private: System::Void CreateDisp() {
 		std::string showdata = "";            //カードより取得した文字列を格納する
 		AdmissionSystem* adm = new AdmissionSystem();    //カードよりデータを取得するためのクラスをインスタンス化
 		//カードデータより名前（漢字）を示す文字列を取得する
-		showdata += "名前（姓）：" + adm->GetData(*this->carddata, NAME_INDEX) + '\n';
+		showdata += FIRST_NAME + adm->GetData(*this->carddata, NAME_INDEX) + '\n';
 		//カードデータより名前（フリガナ）を示す文字列を取得する
-		showdata += "名前（名）：" + adm->GetData(*this->carddata, KANA_INDEX) + '\n';
+		showdata += LAST_NAME + adm->GetData(*this->carddata, KANA_INDEX) + '\n';
 		//カードデータより住所を示す文字列を取得する
-		showdata += "住　　　所：" + adm->GetData(*this->carddata, ADRESS_1_INDEX);
+		showdata += ADDRESS_LABEL + adm->GetData(*this->carddata, ADRESS_1_INDEX);
 		//カードデータより住所を示す文字列を取得する
 		showdata += adm->GetData(*this->carddata, ADRESS_2_INDEX);
 		//カードデータより住所を示す文字列を取得する
@@ -317,26 +313,17 @@ private: System::Void CreateDisp() {
 		//カードデータより住所を示す文字列を取得する
 		showdata += adm->GetData(*this->carddata, ADRESS_5_INDEX) + '\n';
 		//カードデータより電話番号を示す文字列を取得する
-		showdata += "電話番号：" + adm->GetData(*this->carddata, TELL_INDEX) + '\n';
+		showdata += TELL_LABEL + adm->GetData(*this->carddata, TELL_INDEX) + '\n';
 		//カードデータより誕生日を示す文字列を取得する
-		showdata += "誕 生  日：" + this->ConvBirth(data[BIRTH_INDEX]) + '\n';
+		showdata += BIRTH_LABEL + this->ConvBirth(data[BIRTH_INDEX]) + '\n';
 		//カードデータより属性を示す文字列を取得する
-		tmp = this->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4);
-		if (tmp == ELEM_NAME2) {
-			this->label1->Text = gcnew String(tmp.c_str());
-			this->label1->Visible = true;
-		}
-		else if (tmp == ELEM_NAME3) {
-			MessageBox::Show("危険人物です入館を拒否します。");
-			throw gcnew System::Exception("危険人物です。");
-		}
-		showdata += "属　　　性：" + tmp + '\n';
+		showdata += ELEM_LABEL + adm->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4) + '\n';
 		//カードデータ　　　より権限を示す文字列を取得する
-		showdata += "権　　　限：" + this->GetElem(data[ADM_INDEX][5], ADM_NAME1, ADM_NAME2, "", "") + '\n';
+		showdata += ADM_LABEL + adm->GetElem(data[ADM_INDEX][5], ADM_NAME1, ADM_NAME2, "", "") + '\n';
 		//カードデータより役職を示す文字列を取得する
-		showdata += "役　　　職：" + this->GetElem(data[POS_INDEX][6], POS_NAME1, POS_NAME2, POS_NAME3, POS_NAME4) + '\n';
-		showdata += "グループ：" + this->GetElem(data[DEPART_INDEX][7] >> 4, "", OCCUP_NAME1, OCCUP_NAME2, OCCUP_NAME3) + '\n';
-		showdata += "所　　　属：" + this->GetElem(data[DEPART_INDEX][7], "", DEPART_NAME1, DEPART_NAME2, DEPART_NAME3) + '\n';
+		showdata += OCCUP_LABEL + adm->GetElem(data[POS_INDEX][6], POS_NAME1, POS_NAME2, POS_NAME3, POS_NAME4) + '\n';
+		showdata += GROUP_LABEL + adm->GetElem(data[DEPART_INDEX][7] >> 4, "", OCCUP_NAME1, OCCUP_NAME2, OCCUP_NAME3) + '\n';
+		showdata += DEPART_LABEL + adm->GetElem(data[DEPART_INDEX][7], "", DEPART_NAME1, DEPART_NAME2, DEPART_NAME3) + '\n';
 		//メイン画面へ文字列を反映する
 		this->labelInfomasion->Text = gcnew String(showdata.c_str());
 		return;
@@ -348,57 +335,6 @@ private: System::Void CreateDisp() {
 		throw e;
 	}
 }
-
-/*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
-作成日：2017.10.10
-作成者：K.Asada*/
-private: System::Int32 CheckBit(char check) {
-	System::Int32 countbit = 0;    //ビットがたっている場所
-	//対象を走査し何ビット目がたっているかを調べる
-	for (int i = 0; i < 8; i++) {
-		//ビットがたっていたらその場所を変数に格納する
-		if ((check >> i) & 1U) {
-			//ビットがたっている場所を保管する
-			countbit = i + 1;
-			//ループを抜ける
-			break;
-		}
-	}
-	//判定結果を返す
-	return countbit;
-}
-
-		 /*概要:何ビット目がたっているかに応じた文字列を返す関数
-		 引数:string name1:1ビット目がたっているときに返す文字列
-			 :string name2:2ビット目がたっているときに返す文字列
-			 :string name3:3ビット目がたっているときに返す文字列
-			 :string name4:4ビット目がたっているときに返す文字列
-		戻り値:string name:ビット数に応じた文字列
-		作成日:2017.10.17
-		作成者:K.Asada*/
-		 std::string GetElem(unsigned char data, std::string name0, std::string name1, std::string name2, std::string name3) {
-			 std::string name = "";    //返却用の文字列
-			 int checkbit = 0;         //何ビット目がたっていたかを格納する変数
-			 //何ビット目がたっているかを調べる
-			 checkbit = this->CheckBit(data);
-			 //何ビット目がたっていたかによって対応した文字列を返却する
-			 switch (checkbit) {
-		     //1の時は引数1の文字列を返す
-			 case 0:name = name0;
-				 break;
-			 //2の時は引数2の文字列を返す
-			 case 1:name = name1;
-				 break;
-			 //3の時は引数3の文字列を返す
-			 case 2:name = name2;
-				 break;
-			 //4の時は引数4の文字列を返す
-			 case 3:name = name3;
-				 break;
-			 }
-			 //取得した文字列を返却する
-			 return name;
-		 }
 
 		 /*String^型をstring型へ変換する関数
 		 引数：String^ sys_string：変換対象の文字列
@@ -432,8 +368,6 @@ private: System::Int32 CheckBit(char check) {
 				 //1バイトずつ取得していく
 				 condata.bytes[i] = data[i];
 			 }
-			 //バイトからint型に変換する
-			// condata = con;
 			 //誕生年を取得する
 			 year = condata.num / 10000;
 			 //誕生月を取得する
@@ -445,8 +379,6 @@ private: System::Int32 CheckBit(char check) {
 			 //取得した文字列を返却する
 			 return birth;
 		 }
-private: System::Void labelCauntion_Click(System::Object^  sender, System::EventArgs^  e) {
-}
 private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		//入館していない場合は例外を投げる
@@ -456,8 +388,11 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 			//入館していない例外を投げる
 			throw gcnew System::Exception(Constants->NOT_ENTER_MESSAGE);
 		}
+		//タイムカード表示用のクラスをインスタンス化
 		TimeCardForm^ card = gcnew TimeCardForm();
+		//カードデータを渡す
 		*card->carddata = *this->carddata;
+		//ダイアログを開く
 		card->ShowDialog();
 	}
 	catch (System::Exception^ e) {

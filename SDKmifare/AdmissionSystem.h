@@ -29,6 +29,15 @@ public:
 	作成者:K.Asada*/
 	std::string CheckUser(std::vector<std::vector<unsigned char>> data, std::string pass) {
 		std::string uid = "";        //カードより取得したユーザーIDを格納するための文字列
+		//ユーザーの属性を取得する
+		uid = GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4);
+		//危険人物かどうかを判定する
+		if (uid == ELEM_NAME2) {
+			//危険人物あることを表示する
+			System::Windows::Forms::MessageBox::Show(Constants->CAUNTION_MESSAGE);
+			//危険人物であるエラーを投げる
+			throw gcnew System::Exception(Constants->CAUNTION_MESSAGE);
+		}
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
 		uid = GetData(data, UID_INDEX);
 		//取得したユーザー名でファイルを開く
@@ -80,6 +89,7 @@ public:
 		try {
 			std::string datastring = "";    //取得した文字列を格納するための文字列
 			for (int i = beginbyte; i < endbyte; i++) {
+				//NULLを読み飛ばすための処理
 				if (data[index][i] != '\0') {
 					//対象の文字列を取得する
 					datastring += data[index][i];
@@ -160,7 +170,7 @@ public:
 	std::vector<SENDCOMM> ReadySetData(std::vector<std::vector<unsigned char>> data, int blockindex) {
 		try {
 			std::vector<SENDCOMM> sendcomm;        //組み立てたコマンドを格納するための構造体
-			int dataindex = 0;                         //データを取り出すためのインデックス
+			int dataindex = 0;                     //データを取り出すためのインデックス
 			SENDCOMM certify = AUTHENTICATE;       //ブロック認証コマンドのコピー
 			SENDCOMM sendcard = SENDCARD;          //データ送信コマンドのコピー
             //コマンドを初期化する
@@ -177,6 +187,7 @@ public:
 					sendcard.sendCommand[3] = blockindex;
 					//組み立てたコマンドを格納する
 					sendcomm.push_back(sendcard);
+					//そのブロックのコマンドを組み立て終えたら次のブロックへ移動する
 					dataindex++;
 				}//対象のブロックがセクターの末尾の時は読み飛ばす
 				else {
@@ -215,6 +226,7 @@ public:
 			recvdata = con->LinkCard(senddata);
 			//ユーザー情報を確認する関数を呼び出す
 			uid = CheckUser(recvdata, pass);
+			//対象のユーザーが入館中かを判定する
 			if (!CheckLeave(recvdata)) {
 				System::Windows::Forms::MessageBox::Show("このユーザーは入館していません。");
 				throw gcnew System::Exception("このユーザは入館していません。");
@@ -246,6 +258,7 @@ public:
 		try {
 			ConnectCard* con = new ConnectCard();    //カード通信クラスをインスタンス化
 			std::vector<SENDCOMM> senddata;    //送信コマンドを格納するための構造体
+			//データ送信用のコマンドを組み立てる
 			senddata = ReadySetData(uid, BEGIN_BLOCK);
 			//送信コマンドの終わりにコマンドの終わりを示すコマンドを格納する
 			senddata.push_back(ENDCOMMAND);
@@ -277,6 +290,7 @@ public:
 			recvdata = con->LinkCard(sendcomm);
 			//ユーザー情報を確認する関数を呼び出す
 			uid = CheckUser(recvdata, pass);
+			//このユーザーが入館状態でないか判定する
 			if (!CheckEnter(recvdata)) {
 				System::Windows::Forms::MessageBox::Show("このユーザーは退館していません。");
 				throw gcnew System::Exception("このユーザは退館していません。");
@@ -302,9 +316,9 @@ public:
 	作成者:K.Asada*/
 	std::vector<SENDCOMM> ReadyGetData(int blockindex) {
 		try {
-			SENDCOMM authenticate = AUTHENTICATE;    //認証キーコマンドのコピーを作る
+			SENDCOMM authenticate = AUTHENTICATE;     //認証キーコマンドのコピーを作る
 			SENDCOMM readcard = READCARD;             //受信コマンドのコピーを作る
-			std::vector<SENDCOMM> sendcomm;                         //組み立てたコマンドを格納するための配列
+			std::vector<SENDCOMM> sendcomm;           //組み立てたコマンドを格納するための配列
 			//コマンドの初期化処理を行う
 			sendcomm = InitCommand(blockindex);
 			//受信コマンドを組み立てていく
@@ -394,9 +408,9 @@ public:
 		years.num = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
 		//年月が格納されている場所をチェックして取得した年月日と異なれば書き換える
 		if (data[YEAR_INDEX][0] != years.bytes[0] || data[YEAR_INDEX][1] != years.bytes[1]) {
-			//上位8ビットを書き換える
-			data[YEAR_INDEX][0] = years.bytes[0];
 			//下位8ビットを書き換える
+			data[YEAR_INDEX][0] = years.bytes[0];
+			//上位8ビットを書き換える
 			data[YEAR_INDEX][1] = years.bytes[1];
 		}
 		return data;
@@ -409,7 +423,7 @@ public:
 	作成者:K.Asada*/
 	std::vector<SENDCOMM> InitCommand(int beginblock) {
 		std::vector<SENDCOMM> initcommand;    //作成したコマンドを格納するための配列
-		SENDCOMM certify = AUTHENTICATE;                                    //ブロック認証コマンド
+		SENDCOMM certify = AUTHENTICATE;      //ブロック認証コマンド
 		//ブロック認証コマンドの認証先ブロックを書き換える
 		certify.sendCommand[7] = beginblock;
 		//コマンドを組み立てていく
@@ -435,9 +449,9 @@ public:
 		int timeindex = index;
 		//カードデータにある日時分情報を走査していく
 		for (int i = 1; timeindex < endindex && data[timeindex][i * 2] != '\0'; i++) {
-			//カードデータより日時分の上位8ビットを取得する
-			gettimes.bytes[0] = data[timeindex][i * 2];
 			//カードデータより日時分の下位8ビットを取得する
+			gettimes.bytes[0] = data[timeindex][i * 2];
+			//カードデータより日時分の上位8ビットを取得する
 			gettimes.bytes[1] = data[timeindex][i * 2 + 1];
 			//取得した日時分を日に変換する
 			day = gettimes.num / 1440;
@@ -490,7 +504,7 @@ public:
 			 std::vector<std::string> entertimes;    //入館時間を格納する文字列
 			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
 			 bool judge = true;                      //判定結果を格納する
-													 //入館時間を取得する
+             //入館時間を取得する
 			 entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
 			 //退館時間を取得する
 			 leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
@@ -500,5 +514,56 @@ public:
 				 judge = false;
 			 }
 			 return judge;
+		 }
+
+		 /*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
+		 作成日：2017.10.10
+		 作成者：K.Asada*/
+		 int CheckBit(char check) {
+			 int countbit = 0;    //ビットがたっている場所
+		     //対象を走査し何ビット目がたっているかを調べる
+			 for (int i = 0; i < 8; i++) {
+				 //ビットがたっていたらその場所を変数に格納する
+				 if ((check >> i) & 1U) {
+					 //ビットがたっている場所を保管する
+					 countbit = i + 1;
+					 //ループを抜ける
+					 break;
+				 }
+			 }
+			 //判定結果を返す
+			 return countbit;
+		 }
+
+		 /*概要:何ビット目がたっているかに応じた文字列を返す関数
+		 引数:string name1:1ビット目がたっているときに返す文字列
+		 :string name2:2ビット目がたっているときに返す文字列
+		 :string name3:3ビット目がたっているときに返す文字列
+		 :string name4:4ビット目がたっているときに返す文字列
+		 戻り値:string name:ビット数に応じた文字列
+		 作成日:2017.10.17
+		 作成者:K.Asada*/
+		 std::string GetElem(unsigned char data, std::string name0, std::string name1, std::string name2, std::string name3) {
+			 std::string name = "";    //返却用の文字列
+			 int checkbit = 0;         //何ビット目がたっていたかを格納する変数
+			 //何ビット目がたっているかを調べる
+			 checkbit = this->CheckBit(data);
+			 //何ビット目がたっていたかによって対応した文字列を返却する
+			 switch (checkbit) {
+				 //1の時は引数1の文字列を返す
+			 case 0:name = name0;
+				 break;
+				 //2の時は引数2の文字列を返す
+			 case 1:name = name1;
+				 break;
+				 //3の時は引数3の文字列を返す
+			 case 2:name = name2;
+				 break;
+				 //4の時は引数4の文字列を返す
+			 case 3:name = name3;
+				 break;
+			 }
+			 //取得した文字列を返却する
+			 return name;
 		 }
 };

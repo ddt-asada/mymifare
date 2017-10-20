@@ -87,9 +87,9 @@ namespace CONSTANTGROUP {
 		//属性の1ビット目の名前
 		static const char* ELEM_NAME1 = "一般";
 		//属性の2ビット目の名前
-		static const char* ELEM_NAME2 = "要注意人物";
+		static const char* ELEM_NAME2 = "危険人物";
 		//属性の3ビット目の名前
-		static const char* ELEM_NAME3 = "危険人物";
+		static const char* ELEM_NAME3 = "要注意人物";
 		//属性の4ビット目の名前
 		static const char* ELEM_NAME4 = "";
 		//権限の1ビット目の名前
@@ -120,6 +120,26 @@ namespace CONSTANTGROUP {
 		static const char* POS_NAME3 = "部長";
 		//役職の4ビット目の名前
 		static const char* POS_NAME4 = "";
+		//名前（姓）のラベルの名前
+		static const char* FIRST_NAME = "名前（姓）：";
+		//名前（名）のラベルの名前
+		static const char* LAST_NAME = "名前（名）：";
+		//住所のラベルの名前
+		static const char* ADDRESS_LABEL = "住　　　所：";
+		//電話番号のラベルの名前
+		static const char* TELL_LABEL = "電話番号：";
+		//誕生日のラベルの名前
+		static const char* BIRTH_LABEL = "誕 生  日：";
+		//属性のラベルの名前
+		static const char* ELEM_LABEL = "属　　　性：";
+		//権限のラベルの名前
+		static const char* ADM_LABEL = "権　　　限：";
+		//役職のラベルの名前
+		static const char* OCCUP_LABEL = "役　　　職：";
+		//グループのラベルの名前
+		static const char* GROUP_LABEL = "グ ル ー プ：";
+		//所属のラベルの名前
+		static const char* DEPART_LABEL = "所　　　属：";
 	static const SENDCOMM LOADKEY = { 11,{ 0xFF,0x82,0x00,0x00,0x06,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } };
 	//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
 	// General Authenticate
@@ -171,6 +191,8 @@ namespace CONSTANTGROUP {
 		static System::String^ EMPTY_ERROR_MESSAGE = "入力されていない場所があります。\n入力しなおしてください。";
 		//ユーザーIDが未入力の時に表示するメッセージ
 		static System::String^ IDEMPTY_ERROR_MESSAGE = "ユーザーIDが未入力です。\n確認してください。";
+		//危険人物であるときのメッセージ
+		static System::String^ CAUNTION_MESSAGE = "危険人物です。入館を拒否します。";
 		//属性の1ビット目の名前
 		static System::String^ CLI_ELEM_NAME1 = gcnew System::String(ELEM_NAME1);
 		//属性の2ビット目の名前

@@ -181,7 +181,7 @@ namespace sdkmifare {
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(271, 33);
 			this->label1->TabIndex = 18;
-			this->label1->Text = L"ユーザー名(漢字)";
+			this->label1->Text = L"名前（姓）";
 			// 
 			// label9
 			// 
@@ -247,7 +247,7 @@ namespace sdkmifare {
 			this->label14->Name = L"label14";
 			this->label14->Size = System::Drawing::Size(335, 33);
 			this->label14->TabIndex = 31;
-			this->label14->Text = L"ユーザー名(ふりがな)";
+			this->label14->Text = L"名前（名）";
 			// 
 			// buttonOK
 			// 
@@ -542,14 +542,15 @@ namespace sdkmifare {
 
 		}
 #pragma endregion
-		public:String^ UID = "";
-		private:CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();
+		public:String^ UID = "";    //取得したユーザーID
+		private:CONSTANTGROUP::ConstantString^ Constants = gcnew CONSTANTGROUP::ConstantString();    //定数クラスをインスタンス化
+
+/*概要:OKボタンクリック時のイベント
+*/
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
-		char tmp = 0;
-		std::string test2 = "";
-		CONSTANTGROUP::TOC itoc;
-		Int32 index = 0;
+		std::string tmpstr = "";    //文字列を変換する際に使う文字列
+		CONSTANTGROUP::TOC itoc;    //int型のビットを変換するための共用体
 		//ユーザーIDをメンバへ保管する
 		this->UID = this->textBoxUID->Text;
 		//ユーザIDが空の場合はファイルが生成できないのでその時点で処理を終了する
@@ -569,10 +570,10 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		writer->WriteLine(this->CheckByte(this->textBoxPASS->Text, 16));
 		//電話番号を16バイト分書き出す
 		writer->WriteLine(this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
-		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown2->Value) * 100 + Convert::ToInt32(this->numericUpDown3->Value);
-		test2 = itoc.bytes;
+		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown3->Value) * 100 + Convert::ToInt32(this->numericUpDown2->Value);
+		tmpstr = itoc.bytes;
 		//誕生日を4バイト分書き出す
-		writer->Write(this->CheckByte(gcnew String(test2.c_str()), 4));
+		writer->Write(this->CheckByte(gcnew String(tmpstr.c_str()), 4));
 		//属性をビットとして書き出す
 		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1));
 		//権限をビットとして書き出す
@@ -610,24 +611,38 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	}
 }
 
+
+/*概要:指定したバイト数分の文字列を抜き出す関数
+引数:String^ data:対象の文字列
+    :INt32 beginbyte:抜き出しの始点のバイト数
+	:int32 endbyte:抜き出しの終点のバイト数
+戻り値:String^ bytestring:加工し終えた文字列
+作成日:2017.10.20
+作成者:K.Asada*/
 public:System::String^ SetByte(String^ data, Int32 beginbyte, Int32 endbyte) {
 	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
 	array<Byte>^ bytes = e->GetBytes(data);     //文字列をバイト配列に変換する
-	char test[16] = { '\0' };
-	System::String^ bytestring = "";                //返却用の文字列
+	char test[16] = { '\0' };                   //抜き出した文字列を格納するchar配列
+	System::String^ bytestring = "";            //返却用の文字列
 		//文字列を走査して加工する
 		for (int i = beginbyte; i < endbyte && i < bytes->Length; i++) {
-			//指定のバイト数分空白文字で埋めていく
+			//指定のバイト数分抜き出していく
 			test[i] = bytes[i];
 		}
 	//加工し終えた文字列を返却する
 	return bytestring = gcnew String(test);
 }
 
+
+/*概要:指定したバイト数を超えていないかを確認するための関数
+引数:String^ data:対象の文字列
+    :Int32 checkbyte:指定のバイト数
+戻り値:String^ data:確認を終えた文字列
+作成日:2017.10.20
+作成者:K.Asada*/
 public:System::String^ CheckByte(String^ data, Int32 checkbyte) {
 	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
 	Int32 bytecount = e->GetByteCount(data);    //受け取った文字列をを"shift_jis"としてバイト数をカウントする
-	array<Byte>^ test = e->GetBytes(data);
 	//文字列のバイト数が指定のバイト数を超えていないかのチェック
 	if (bytecount > checkbyte) {
 		//画面にエラーをひょうじする
@@ -641,14 +656,19 @@ public:System::String^ CheckByte(String^ data, Int32 checkbyte) {
 		//情報未入力の例外を投げる
 		throw gcnew System::Exception(Constants->EMPTY_ERROR_MESSAGE);
 	}
-	//加工し終えた文字列を返却する
+	//判定を終えた文字列を返却する
 	return data;
 }
 
+/*概要:キャンセルボタンクリック時のイベント
+*/
 private: System::Void buttonCancel_Click(System::Object^  sender, System::EventArgs^  e) {
 	//何も行わずにダイアログを閉じる
 	this->Close();
 }
+
+/*概要:テキストボックスにて数字以外を入力できないようにする関数
+*/
 private: System::Void textBoxTELL1_KeyPress(System::Object^  sender, System::Windows::Forms::KeyPressEventArgs^  e) {
 	if ((e->KeyChar < 0x30) || (e->KeyChar > 0x39)) {
 		if (e->KeyChar != '\b') {
