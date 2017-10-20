@@ -295,7 +295,8 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 private: System::Void CreateDisp() {
 	try {
 		std::vector<std::vector<unsigned char>> data = *this->carddata;
-		std::string tmp = "";
+		std::string check = "";    //属性を判定するための文字列
+		char adress1[16] = { '\0' };    //住所を格納するための文字列
 		std::string showdata = "";            //カードより取得した文字列を格納する
 		AdmissionSystem* adm = new AdmissionSystem();    //カードよりデータを取得するためのクラスをインスタンス化
 		//カードデータより名前（漢字）を示す文字列を取得する
@@ -316,8 +317,16 @@ private: System::Void CreateDisp() {
 		showdata += TELL_LABEL + adm->GetData(*this->carddata, TELL_INDEX) + '\n';
 		//カードデータより誕生日を示す文字列を取得する
 		showdata += BIRTH_LABEL + this->ConvBirth(data[BIRTH_INDEX]) + '\n';
+		//属性を取得する
+		check = adm->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4);
+		//属性の判定を行う
+		if (check == ELEM_NAME3) {
+			//要注意人物であればその旨を表示する
+			MessageBox::Show("要注意人物です。");
+			this->label1->Visible = true;
+		}
 		//カードデータより属性を示す文字列を取得する
-		showdata += ELEM_LABEL + adm->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4) + '\n';
+		showdata += ELEM_LABEL + check + '\n';
 		//カードデータ　　　より権限を示す文字列を取得する
 		showdata += ADM_LABEL + adm->GetElem(data[ADM_INDEX][5], ADM_NAME1, ADM_NAME2, "", "") + '\n';
 		//カードデータより役職を示す文字列を取得する

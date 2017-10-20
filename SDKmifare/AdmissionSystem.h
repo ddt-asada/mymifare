@@ -57,7 +57,7 @@ public:
 
 	/*概要:対象のユーザーのパスワードを確認し、正しいかを判定するための関数
 	引数:string name:ユーザーの名前
-	    :string pass:ユーザーが入力したパスワード
+		:string pass:ユーザーが入力したパスワード
 		:ifstream file:ユーザの情報が格納されたファイルへのストリーム
 	戻り値:bool:照合結果の正否
 	作成日:2017.10.10
@@ -79,7 +79,7 @@ public:
 
 	/*概要：カードより取得したunsigned charより文字列を取得するための関数
 	引数:unsigned char data:カードより取得した変数
-	    :int index:取得対象の文字列が存在するブロック
+		:int index:取得対象の文字列が存在するブロック
 		:int endbyte:データより取得する文字列のバイト数
 		:int beginbyte:取得するときの始点(1ブロックに複数のデータが含まれている場合に指定)
 	戻り値:string datastring:取得した文字列
@@ -102,7 +102,7 @@ public:
 			System::Console::WriteLine(e);
 		}
 	}
-	
+
 	/*概要:カードへ送信するデータの組み立て、コマンドの作成を行う関数
 	引数:string setdata:送信するデータ
 	戻り値:unsigned char:データを送信するためのコマンド
@@ -133,7 +133,7 @@ public:
 							//送信データとしてコマンドに格納する
 							sendcard.sendCommand[5 + i] = setdata;
 							//ファイルから1バイト分データを取得する
-							ifs.get(setdata);
+								ifs.get(setdata);
 						}//末尾の時は空データを格納していく
 						else {
 							//空データを示す0を格納していく
@@ -173,7 +173,7 @@ public:
 			int dataindex = 0;                     //データを取り出すためのインデックス
 			SENDCOMM certify = AUTHENTICATE;       //ブロック認証コマンドのコピー
 			SENDCOMM sendcard = SENDCARD;          //データ送信コマンドのコピー
-            //コマンドを初期化する
+			//コマンドを初期化する
 			sendcomm = InitCommand(blockindex);
 			//コマンドを組み立てていく
 			for (; blockindex < END_BLOCK; blockindex++) {
@@ -209,7 +209,7 @@ public:
 
 	/*概要:カードへデータを送信するための関数
 	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
-	    :SCARDHANDLE hCard:取得したカード
+		:SCARDHANDLE hCard:取得したカード
 		:string uid:取得したカードのユーザーID
 	戻り値:なし
 	作成日:2017.10.10
@@ -273,7 +273,7 @@ public:
 
 	/*概要:カードからデータを受信するための関数
 	引数:SCARDCONTEXT hContext:取得したリソースマネージャ
-	    :SCARDHANDLE hCard:取得したカード
+		:SCARDHANDLE hCard:取得したカード
 	戻り値:string uid:カードより取得したユーザーID
 	作成日:2017.10.10
 	作成者:K.Asada*/
@@ -439,131 +439,131 @@ public:
 	戻り値:std::vector<string> times:日時分を文字列に変換した配列
 	作成日:2017.10.16
 	作成者:K.Asada*/
- std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data, int index,int endindex) {
-	try {
-		std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
-		ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
-		int day = 0;                           //取得した日を格納する変数
-		int hour = 0;                          //取得した時間を格納する変数
-		int min = 0;                           //取得した分を格納する変数
-		int timeindex = index;
-		//カードデータにある日時分情報を走査していく
-		for (int i = 1; timeindex < endindex && data[timeindex][i * 2] != '\0'; i++) {
-			//カードデータより日時分の下位8ビットを取得する
-			gettimes.bytes[0] = data[timeindex][i * 2];
-			//カードデータより日時分の上位8ビットを取得する
-			gettimes.bytes[1] = data[timeindex][i * 2 + 1];
-			//取得した日時分を日に変換する
-			day = gettimes.num / 1440;
-			//取得した日時分を時に変換する
-			hour = gettimes.num / 60 - day * 24;
-			//取得した日時分を分に変換する
-			min = gettimes.num - 1440 * day - 60 * hour;
-			//変換した日時分を連結して文字列を完成させる
-			times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n');
-			if (i == 7) {
-				i = -1;
-				timeindex++;
+	std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data, int index, int endindex) {
+		try {
+			std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
+			ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
+			int day = 0;                           //取得した日を格納する変数
+			int hour = 0;                          //取得した時間を格納する変数
+			int min = 0;                           //取得した分を格納する変数
+			int timeindex = index;
+			//カードデータにある日時分情報を走査していく
+			for (int i = 1; timeindex < endindex && data[timeindex][i * 2] != '\0'; i++) {
+				//カードデータより日時分の下位8ビットを取得する
+				gettimes.bytes[0] = data[timeindex][i * 2];
+				//カードデータより日時分の上位8ビットを取得する
+				gettimes.bytes[1] = data[timeindex][i * 2 + 1];
+				//取得した日時分を日に変換する
+				day = gettimes.num / 1440;
+				//取得した日時分を時に変換する
+				hour = gettimes.num / 60 - day * 24;
+				//取得した日時分を分に変換する
+				min = gettimes.num - 1440 * day - 60 * hour;
+				//変換した日時分を連結して文字列を完成させる
+				times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n');
+				if (i == 7) {
+					i = -1;
+					timeindex++;
+				}
+			}
+			//変換した文字列を返却する
+			return times;
+		}
+		catch (System::IndexOutOfRangeException^ e) {
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要:ユーザーが入館状態かどうかをチェックするための関数
+	引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+	戻り値:bool judge:判定結果
+	作成日:2017.10.19
+	作成者:K.Asada*/
+	bool CheckEnter(std::vector<std::vector<unsigned char>> data) {
+		std::vector<std::string> entertimes;    //入館時間を格納する文字列
+		std::vector<std::string> leavetimes;    //退館時間を格納する文字列
+		bool judge = true;                      //判定結果を格納する
+		//入館時間を取得する
+		entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
+		//退館時間を取得する
+		leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
+		//入館状態かどうかの判定を行う
+		if (entertimes.size() > leavetimes.size()) {
+			//入館状態である判定を返す
+			judge = false;
+		}
+		return judge;
+	}
+
+	/*概要:ユーザーが入館状態かどうかをチェックするための関数
+	引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+	戻り値:bool judge:判定結果
+	作成日:2017.10.19
+	作成者:K.Asada*/
+	bool CheckLeave(std::vector<std::vector<unsigned char>> data) {
+		std::vector<std::string> entertimes;    //入館時間を格納する文字列
+		std::vector<std::string> leavetimes;    //退館時間を格納する文字列
+		bool judge = true;                      //判定結果を格納する
+		//入館時間を取得する
+		entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
+		//退館時間を取得する
+		leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
+		//入館状態かどうかの判定を行う
+		if (entertimes.size() <= leavetimes.size()) {
+			//入館状態である判定を返す
+			judge = false;
+		}
+		return judge;
+	}
+
+	/*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
+	作成日：2017.10.10
+	作成者：K.Asada*/
+	int CheckBit(char check) {
+		int countbit = 0;    //ビットがたっている場所
+		//対象を走査し何ビット目がたっているかを調べる
+		for (int i = 0; i < 8; i++) {
+			//ビットがたっていたらその場所を変数に格納する
+			if ((check >> i) & 1U) {
+				//ビットがたっている場所を保管する
+				countbit = i + 1;
+				//ループを抜ける
+				break;
 			}
 		}
-		//変換した文字列を返却する
-		return times;
+		//判定結果を返す
+		return countbit;
 	}
-	catch (System::IndexOutOfRangeException^ e) {
-		System::Console::WriteLine(e);
-	}
-}
 
-		 /*概要:ユーザーが入館状態かどうかをチェックするための関数
-		 引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
-		 戻り値:bool judge:判定結果
-		 作成日:2017.10.19
-		 作成者:K.Asada*/
-		 bool CheckEnter(std::vector<std::vector<unsigned char>> data) {
-			 std::vector<std::string> entertimes;    //入館時間を格納する文字列
-			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
-			 bool judge = true;                      //判定結果を格納する
-			 //入館時間を取得する
-			 entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
-			 //退館時間を取得する
-			 leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
-			 //入館状態かどうかの判定を行う
-			 if (entertimes.size() > leavetimes.size()){
-				 //入館状態である判定を返す
-				 judge = false;
-			 }
-			 return judge;
+	/*概要:何ビット目がたっているかに応じた文字列を返す関数
+	引数:string name1:1ビット目がたっているときに返す文字列
+	:string name2:2ビット目がたっているときに返す文字列
+	:string name3:3ビット目がたっているときに返す文字列
+	:string name4:4ビット目がたっているときに返す文字列
+	戻り値:string name:ビット数に応じた文字列
+	作成日:2017.10.17
+	作成者:K.Asada*/
+	std::string GetElem(unsigned char data, std::string name0, std::string name1, std::string name2, std::string name3) {
+		std::string name = "";    //返却用の文字列
+		int checkbit = 0;         //何ビット目がたっていたかを格納する変数
+		//何ビット目がたっているかを調べる
+		checkbit = this->CheckBit(data);
+		//何ビット目がたっていたかによって対応した文字列を返却する
+		switch (checkbit) {
+			//1の時は引数1の文字列を返す
+		case 0:name = name0;
+			break;
+			//2の時は引数2の文字列を返す
+		case 1:name = name1;
+			break;
+			//3の時は引数3の文字列を返す
+		case 2:name = name2;
+			break;
+			//4の時は引数4の文字列を返す
+		case 3:name = name3;
+			break;
 		}
-
-		 /*概要:ユーザーが入館状態かどうかをチェックするための関数
-		 引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
-		 戻り値:bool judge:判定結果
-		 作成日:2017.10.19
-		 作成者:K.Asada*/
-		 bool CheckLeave(std::vector<std::vector<unsigned char>> data) {
-			 std::vector<std::string> entertimes;    //入館時間を格納する文字列
-			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
-			 bool judge = true;                      //判定結果を格納する
-             //入館時間を取得する
-			 entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
-			 //退館時間を取得する
-			 leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
-			 //入館状態かどうかの判定を行う
-			 if (entertimes.size() <= leavetimes.size()) {
-				 //入館状態である判定を返す
-				 judge = false;
-			 }
-			 return judge;
-		 }
-
-		 /*概要:ユーザーの属性を判定し、それに応じた判定を返す関数
-		 作成日：2017.10.10
-		 作成者：K.Asada*/
-		 int CheckBit(char check) {
-			 int countbit = 0;    //ビットがたっている場所
-		     //対象を走査し何ビット目がたっているかを調べる
-			 for (int i = 0; i < 8; i++) {
-				 //ビットがたっていたらその場所を変数に格納する
-				 if ((check >> i) & 1U) {
-					 //ビットがたっている場所を保管する
-					 countbit = i + 1;
-					 //ループを抜ける
-					 break;
-				 }
-			 }
-			 //判定結果を返す
-			 return countbit;
-		 }
-
-		 /*概要:何ビット目がたっているかに応じた文字列を返す関数
-		 引数:string name1:1ビット目がたっているときに返す文字列
-		 :string name2:2ビット目がたっているときに返す文字列
-		 :string name3:3ビット目がたっているときに返す文字列
-		 :string name4:4ビット目がたっているときに返す文字列
-		 戻り値:string name:ビット数に応じた文字列
-		 作成日:2017.10.17
-		 作成者:K.Asada*/
-		 std::string GetElem(unsigned char data, std::string name0, std::string name1, std::string name2, std::string name3) {
-			 std::string name = "";    //返却用の文字列
-			 int checkbit = 0;         //何ビット目がたっていたかを格納する変数
-			 //何ビット目がたっているかを調べる
-			 checkbit = this->CheckBit(data);
-			 //何ビット目がたっていたかによって対応した文字列を返却する
-			 switch (checkbit) {
-				 //1の時は引数1の文字列を返す
-			 case 0:name = name0;
-				 break;
-				 //2の時は引数2の文字列を返す
-			 case 1:name = name1;
-				 break;
-				 //3の時は引数3の文字列を返す
-			 case 2:name = name2;
-				 break;
-				 //4の時は引数4の文字列を返す
-			 case 3:name = name3;
-				 break;
-			 }
-			 //取得した文字列を返却する
-			 return name;
-		 }
+		//取得した文字列を返却する
+		return name;
+	}
 };

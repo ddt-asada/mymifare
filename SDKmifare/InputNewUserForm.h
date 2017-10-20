@@ -549,7 +549,6 @@ namespace sdkmifare {
 */
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
-		std::string tmpstr = "";    //文字列を変換する際に使う文字列
 		CONSTANTGROUP::TOC itoc;    //int型のビットを変換するための共用体
 		//ユーザーIDをメンバへ保管する
 		this->UID = this->textBoxUID->Text;
@@ -570,10 +569,10 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		writer->WriteLine(this->CheckByte(this->textBoxPASS->Text, 16));
 		//電話番号を16バイト分書き出す
 		writer->WriteLine(this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
+		//生年月日をint型に変換して保持する
 		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown3->Value) * 100 + Convert::ToInt32(this->numericUpDown2->Value);
-		tmpstr = itoc.bytes;
 		//誕生日を4バイト分書き出す
-		writer->Write(this->CheckByte(gcnew String(tmpstr.c_str()), 4));
+		writer->Write(this->CheckByte(gcnew String(itoc.bytes, 0, 4), 4));
 		//属性をビットとして書き出す
 		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1));
 		//権限をビットとして書き出す
@@ -622,15 +621,16 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 public:System::String^ SetByte(String^ data, Int32 beginbyte, Int32 endbyte) {
 	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
 	array<Byte>^ bytes = e->GetBytes(data);     //文字列をバイト配列に変換する
-	char test[16] = { '\0' };                   //抜き出した文字列を格納するchar配列
+	int index = 0;
+	char getbyte[16] = { '\0' };                   //抜き出した文字列を格納するchar配列
 	System::String^ bytestring = "";            //返却用の文字列
 		//文字列を走査して加工する
 		for (int i = beginbyte; i < endbyte && i < bytes->Length; i++) {
 			//指定のバイト数分抜き出していく
-			test[i] = bytes[i];
+			getbyte[index++] = bytes[i];
 		}
 	//加工し終えた文字列を返却する
-	return bytestring = gcnew String(test);
+	return bytestring = gcnew String(getbyte,0,16);
 }
 
 

@@ -76,7 +76,7 @@ public:
 		：SENDCOMM SendComm：カードへ送信するコマンド
 	作成日：2017.10.10
 	作成者：K.Asada*/
-		std::vector<std::vector<unsigned char>> Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD ActiveProtocol, std::vector<CONSTANTGROUP::SENDCOMM> SendComm) {
+	std::vector<std::vector<unsigned char>> Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD ActiveProtocol, std::vector<CONSTANTGROUP::SENDCOMM> SendComm) {
 		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
@@ -119,7 +119,7 @@ public:
 
 	/*概要:カードリーダの状態を取得し、カードが置かれたときにカードを読み込む関数
 	引数:SCARDCONTEXT hContext:確保したリソースマネージャのアドレス
-	    :SCARDHANDLE hCard:カードへのポインタ
+		:SCARDHANDLE hCard:カードへのポインタ
 	戻り値:DWORD ActiveProtocol:開通したプロトコル
 	作成日:2017.10.10
 	作成者:K.Asada*/

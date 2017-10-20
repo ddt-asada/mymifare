@@ -134,8 +134,8 @@ namespace sdkmifare {
 				//表画像の格子を描画する
 				gr->DrawRectangle(Pens::Black, 200, 50 * i, 200, 50);
 				//入館日を描画する
-				gr->DrawString(gcnew String(entertimes[i].c_str()), font, Brushes::Black, 0, 50*i);
-				
+				gr->DrawString(gcnew String(entertimes[i].c_str()), font, Brushes::Black, 0, 50 * i);
+
 			}
 			//退館日の走査を行う
 			for (int i = 0; i < leavetimes.size(); i++) {
@@ -156,7 +156,7 @@ namespace sdkmifare {
 			//カードデータより年月を取得する
 			years = this->ConvYears(data);
 			//空のビットマップを生成する
-			System::Drawing::Bitmap^ img = gcnew Bitmap(200 * 2 + 1, 100 +1);
+			System::Drawing::Bitmap^ img = gcnew Bitmap(200 * 2 + 1, 100 + 1);
 			//描画用のグラフィッククラスインスタンス化
 			System::Drawing::Graphics^ gr = System::Drawing::Graphics::FromImage(img);
 			//文字列描画用のフォントをインスタンス化
@@ -181,39 +181,39 @@ namespace sdkmifare {
 			return img;
 		}
 
-				  /*概要:カードに格納された年月情報を文字列に変換するための関数
-				  引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
-				  戻り値:std::vector<std::string> years:文字列に変換した年月
-				  作成日:2017.10.16
-				  作成者:K.Asada*/
-private: std::string ConvYears(std::vector<std::vector<unsigned char>> data) {
-	try {
-		std::string years;        //変換した文字列を格納する
-		ITOC getyears;            //カードより取得した年月をunsigned int型に変換するための共有体
-		int year = 0;             //取得した年
-		int month = 0;            //取得した月
-								  //カードデータより年月の上位8ビットを取得する
-		getyears.bytes[0] = data[YEAR_INDEX][0];
-		//カードデータより年月の下位8ビットを取得する
-		getyears.bytes[1] = data[YEAR_INDEX][1];
-		//年月を年に変換する
-		year = getyears.num / 12;
-		//年月を月に変換する
-		month = getyears.num % 12;
-		//変換した年月を連結して文字列を完成させる
-		years = (std::to_string(year) + "年" + std::to_string(month) + "月");
-		//変換した文字列を返却する
-		return years;
+		/*概要:カードに格納された年月情報を文字列に変換するための関数
+		引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
+		戻り値:std::vector<std::string> years:文字列に変換した年月
+		作成日:2017.10.16
+		作成者:K.Asada*/
+	private: std::string ConvYears(std::vector<std::vector<unsigned char>> data) {
+		try {
+			std::string years;        //変換した文字列を格納する
+			ITOC getyears;            //カードより取得した年月をunsigned int型に変換するための共有体
+			int year = 0;             //取得した年
+			int month = 0;            //取得した月
+									  //カードデータより年月の上位8ビットを取得する
+			getyears.bytes[0] = data[YEAR_INDEX][0];
+			//カードデータより年月の下位8ビットを取得する
+			getyears.bytes[1] = data[YEAR_INDEX][1];
+			//年月を年に変換する
+			year = getyears.num / 12;
+			//年月を月に変換する
+			month = getyears.num % 12;
+			//変換した年月を連結して文字列を完成させる
+			years = (std::to_string(year) + "年" + std::to_string(month) + "月");
+			//変換した文字列を返却する
+			return years;
+		}
+		catch (System::IndexOutOfRangeException^ e) {
+			System::Console::WriteLine(e);
+		}
 	}
-	catch (System::IndexOutOfRangeException^ e) {
-		System::Console::WriteLine(e);
-	}
-}
 	private: System::Void TimeCardForm_Load(System::Object^  sender, System::EventArgs^  e) {
 		//タイトル部分の表画像を作成する
 		this->pictureBox1->Image = this->InitPict(*this->carddata);
 		//表画像の中身を作成する
 		this->pictureBox2->Image = this->CreateTimes(*this->carddata);
 	}
-};
+	};
 }
