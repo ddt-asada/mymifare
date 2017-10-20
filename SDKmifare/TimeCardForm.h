@@ -119,9 +119,9 @@ namespace sdkmifare {
 			std::vector<std::string> leavetimes;    //退館日を格納する文字列
 			int index = 0;    //ループ回数を設定するための変数
 			//カードデータより入館日を取得する
-			entertimes = adm->ConvTimes(data, TIMES_1_INDEX);
+			entertimes = adm->ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
 			//カードデータより退館日を取得する
-			leavetimes = adm->ConvTimes(data, LEAVE_1_INDEX);
+			leavetimes = adm->ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
 			//入館日の要素数を取得する
 			index = entertimes.size();
 			System::Drawing::Bitmap^ img = gcnew Bitmap(200 * 2 + 1, 50 * index + 1);    //画像用の空のビットマップを作成
@@ -181,86 +181,6 @@ namespace sdkmifare {
 			return img;
 		}
 
-		/*概要:カードに格納された日時分情報を文字列に変換する関数
-		引数:std::vector<std::vcotr<unsigned char>> data:カードデータ
-		戻り値:std::vector<string> times:日時分を文字列に変換した配列
-		作成日:2017.10.16
-		作成者:K.Asada*/
-private: std::vector<std::string> ConvEnterTimes(std::vector<std::vector<unsigned char>> data) {
-	try {
-		std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
-		ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
-		int day = 0;                           //取得した日を格納する変数
-		int hour = 0;                          //取得した時間を格納する変数
-		int min = 0;                           //取得した分を格納する変数
-		int timeindex = TIMES_1_INDEX;
-		//カードデータにある日時分情報を走査していく
-		for (int i = 1; data[timeindex][i * 2] != ' '; i++) {
-			//カードデータより日時分の上位8ビットを取得する
-			gettimes.bytes[1] = data[timeindex][i * 2];
-			//カードデータより日時分の下位8ビットを取得する
-			gettimes.bytes[0] = data[timeindex][i * 2 + 1];
-			//取得した日時分を日に変換する
-			day = gettimes.num / 1440;
-			//取得した日時分を時に変換する
-			hour = gettimes.num / 60 - day * 24;
-			//取得した日時分を分に変換する
-			min = gettimes.num - 1440 * day - 60 * hour;
-			//変換した日時分を連結して文字列を完成させる
-			times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n');
-			if (i == 7) {
-				i = -1;
-				timeindex++;
-			}
-		}
-		//変換した文字列を返却する
-		return times;
-	}
-	catch (System::IndexOutOfRangeException^ e) {
-		System::Console::WriteLine(e);
-	}
-}
-
-		 /*概要:カードに格納された退館時間を取得するための関数
-		 引数:std::vector<std::vcotr<unsigned char>> data:カードデータ
-		 戻り値:std::vector<string> times:日時分を文字列に変換した配列
-		 作成日:2017.10.17
-		 作成者:K.Asada*/
-		 private: std::vector<std::string> ConvLeaveTimes(std::vector<std::vector<unsigned char>> data) {
-			 try {
-				std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
-				 ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
-				 int day = 0;                           //取得した日を格納する変数
-				 int hour = 0;                          //取得した時間を格納する変数
-				 int min = 0;                           //取得した分を格納する変数
-				 int timeindex = LEAVE_1_INDEX;
-				 //カードデータにある日時分情報を走査していく
-				 for (int i = 0; data[timeindex][i * 2] != ' '; i++) {
-					 //カードデータより日時分の上位8ビットを取得する
-					 gettimes.bytes[1] = data[timeindex][i * 2];
-					 //カードデータより日時分の下位8ビットを取得する
-					 gettimes.bytes[0] = data[timeindex][i * 2 + 1];
-					 //取得した日時分を日に変換する
-					 day = gettimes.num / 1440;
-					 //取得した日時分を時に変換する
-					 hour = gettimes.num / 60 - day * 24;
-					 //取得した日時分を分に変換する
-					 min = gettimes.num - 1440 * day - 60 * hour;
-					 //変換した日時分を連結して文字列を完成させる
-					 times.push_back(std::to_string(day) + "日" + std::to_string(hour) + "時" + std::to_string(min) + "分" + '\n');
-					 if (i == 7) {
-						 i = -1;
-						 timeindex++;
-					 }
-				 }
-				 //変換した文字列を返却する
-				 return times;
-			 }
-			 catch (System::IndexOutOfRangeException^ e) {
-				 System::Console::WriteLine(e);
-			 }
-		 }
-
 				  /*概要:カードに格納された年月情報を文字列に変換するための関数
 				  引数:std::vector<std::vector<unsigned char>> data:カードより取得したデータ
 				  戻り値:std::vector<std::string> years:文字列に変換した年月
@@ -273,9 +193,9 @@ private: std::string ConvYears(std::vector<std::vector<unsigned char>> data) {
 		int year = 0;             //取得した年
 		int month = 0;            //取得した月
 								  //カードデータより年月の上位8ビットを取得する
-		getyears.bytes[1] = data[YEAR_INDEX][0];
+		getyears.bytes[0] = data[YEAR_INDEX][0];
 		//カードデータより年月の下位8ビットを取得する
-		getyears.bytes[0] = data[YEAR_INDEX][1];
+		getyears.bytes[1] = data[YEAR_INDEX][1];
 		//年月を年に変換する
 		year = getyears.num / 12;
 		//年月を月に変換する

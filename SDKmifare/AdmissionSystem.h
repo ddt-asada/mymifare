@@ -34,7 +34,7 @@ public:
 		//取得したユーザー名でファイルを開く
 		std::ifstream ifs(uid);
 		//ユーザーIDをファイル名としたファイルが開けないときはユーザーが存在していないとして例外を投げる
-		if (!ifs) {
+		if (!ifs.is_open()) {
 			//対象のユーザーが存在していない旨を例外として投げる
 			throw gcnew System::Exception(Constants->ID_NOT_FOUND_ERROR);
 		}//それ以外の時はパスワードの判定に移る
@@ -80,8 +80,10 @@ public:
 		try {
 			std::string datastring = "";    //取得した文字列を格納するための文字列
 			for (int i = beginbyte; i < endbyte; i++) {
-				//対象の文字列を取得する
-				datastring += data[index][i];
+				if (data[index][i] != '\0') {
+					//対象の文字列を取得する
+					datastring += data[index][i];
+				}
 			}
 			//取得した文字列を返却する
 			return datastring;
@@ -110,14 +112,18 @@ public:
 			for (; blockindex < END_BLOCK; blockindex++) {
 				//対象のブロックが4の倍数‐1の時は読み飛ばす
 				if (blockindex % 4 != 3) {
-					//16バイト分の送信コマンドを組み立てていく
-					for (int i = 0; i < 16; i++) {
+					if (!ifs.eof()) {
 						//ファイルから1バイト分データを取得する
 						ifs.get(setdata);
+					}
+					//16バイト分の送信コマンドを組み立てていく
+					for (int i = 0; i < 16; i++) {
 						//ファイルが末尾に到達していなければコマンドに送信データを格納していく
-						if (!ifs.eof()) {
+						if (setdata != '\n' && !ifs.eof()) {
 							//送信データとしてコマンドに格納する
 							sendcard.sendCommand[5 + i] = setdata;
+							//ファイルから1バイト分データを取得する
+							ifs.get(setdata);
 						}//末尾の時は空データを格納していく
 						else {
 							//空データを示す0を格納していく
@@ -128,6 +134,50 @@ public:
 					sendcard.sendCommand[3] = blockindex;
 					//組み立てたコマンドを格納する
 					sendcomm.push_back(sendcard);
+				}//対象のブロックがセクターの末尾の時は読み飛ばす
+				else {
+					//読み飛ばすと同時に次のセクターへの認証を行う
+					certify.sendCommand[7] = blockindex + 1;
+					//送信コマンドに格納する
+					sendcomm.push_back(certify);
+				}
+			}
+			//コマンドの終わりを示すコマンドを格納する
+			sendcomm.push_back({ -1, NULL });
+			//組み立てたコマンドを返却する
+			return sendcomm;
+		}
+		catch (System::IndexOutOfRangeException^ e) {
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要:カードへ送信するデータの組み立て、コマンドの作成を行う関数
+	引数:string setdata:送信するデータ
+	戻り値:unsigned char:データを送信するためのコマンド
+	作成日:2017.10.10
+	作成者:K.Asada*/
+	std::vector<SENDCOMM> ReadySetData(std::vector<std::vector<unsigned char>> data, int blockindex) {
+		try {
+			std::vector<SENDCOMM> sendcomm;        //組み立てたコマンドを格納するための構造体
+			int dataindex = 0;                         //データを取り出すためのインデックス
+			SENDCOMM certify = AUTHENTICATE;       //ブロック認証コマンドのコピー
+			SENDCOMM sendcard = SENDCARD;          //データ送信コマンドのコピー
+            //コマンドを初期化する
+			sendcomm = InitCommand(blockindex);
+			//コマンドを組み立てていく
+			for (; blockindex < END_BLOCK; blockindex++) {
+				//対象のブロックが4の倍数‐1の時は読み飛ばす
+				if (blockindex % 4 != 3) {
+					//16バイト分の送信コマンドを組み立てていく
+					for (int i = 0; i < 16; i++) {
+						sendcard.sendCommand[5 + i] = data[dataindex][i];
+					}
+					//データを送信する対象のブロックを設定する
+					sendcard.sendCommand[3] = blockindex;
+					//組み立てたコマンドを格納する
+					sendcomm.push_back(sendcard);
+					dataindex++;
 				}//対象のブロックがセクターの末尾の時は読み飛ばす
 				else {
 					//読み飛ばすと同時に次のセクターへの認証を行う
@@ -170,9 +220,9 @@ public:
 				throw gcnew System::Exception("このユーザは入館していません。");
 			}
 			//退館日を記録する
-			SetLeaveTimes(uid);
+			recvdata = SetTimes(recvdata, LEAVE_1_INDEX, END_INDEX);
 			//送信コマンドを作成する関数を呼び出す
-			senddata = ReadySetData(uid, BEGIN_BLOCK);
+			senddata = ReadySetData(recvdata, BEGIN_BLOCK);
 			//送信コマンドの終わりにコマンドの終わりを示すコマンドを格納する
 			senddata.push_back(ENDCOMMAND);
 			//カードへコマンドを送信する関数を呼び出す
@@ -232,9 +282,9 @@ public:
 				throw gcnew System::Exception("このユーザは退館していません。");
 			}
 			//入館時間を取得する関数を呼び出す
-			SetEnterTimes(uid);
+			recvdata = SetTimes(recvdata, TIMES_1_INDEX, LEAVE_1_INDEX);
 			//入館時間をカードに記録させるためのコマンドを作成する
-			copycomm = ReadySetData(uid, BEGIN_BLOCK);
+			copycomm = ReadySetData(recvdata, BEGIN_BLOCK);
 			//コマンドを連結する
 			sendcomm.insert(sendcomm.begin(), copycomm.begin(), copycomm.end() - 1);
 			//カードへデータを送信する
@@ -288,73 +338,32 @@ public:
 	戻り値:なし
 	作成日：2017.10.11
 	作成者:K.Asada*/
-	void SetAdmissionTimes(std::string uid) {
+	std::vector<std::vector<unsigned char>> SetTimes(std::vector<std::vector<unsigned char>> data, int index, int endindex) {
 		ITOC times;            //取得した日時分を分に変換したものを格納する
 		//年月をチェックする関数を呼び出し、年月が現在年月と異なっていたら書き換える
-		CheckYears(uid);
+		data = CheckYears(data);
 		//関数より現在日時分を取得する
 		times.num = GetAdmissionTime();
-		//データを書き込む対象のファイルを開く
-		std::ofstream ofs(uid, std::ios::app);
-		//取得した日時分の上位8ビットをファイルに書き出す
-		ofs << times.bytes[1];
-		//取得した日時分の下位8ビットをファイルに書き出す
-		ofs << times.bytes[0];
-		//書き出しを終えたら閉じる
-		ofs.close();
-		return;
-	}
-
-	/*概要:入館日の取得及び年月の確認を行う関数
-	引数:string uid:チェック対象のユーザのID
-	戻り値:なし
-	作成日：2017.10.11
-	作成者:K.Asada*/
-	void SetEnterTimes(std::string uid) {
-		ITOC times;
-		char getdata[BLOCK_COUNT * 16];
-		CheckYears(uid);
-		times.num = GetAdmissionTime();
-		std::ifstream ifs(uid);
-		ifs.get(getdata, BLOCK_COUNT * 16);
-		for (int i = TIMES_1_INDEX * 16; i < LEAVE_1_INDEX * 16; i++) {
-			if (getdata[i] == ' ') {
-				getdata[i] = times.bytes[1];
-				getdata[i + 1] = times.bytes[0];
-				std::ofstream ofs(uid, std::ios::binary);
-				ofs.write(getdata, 16 * BLOCK_COUNT);
-				ofs.close();
+		//対象のデータの走査を行う
+		for (int i = 2; index < endindex; i++) {
+			//データが存在しない場所があれば移行
+			if (data[index][i] == '\0') {
+				//上位8ビットを格納する
+				data[index][i] = times.bytes[0];
+				//下位8ビットを格納する
+				data[index][i + 1] = times.bytes[1];
+				//走査を終了する
 				break;
 			}
-		}
-		ifs.close();
-		return;
-	}
-
-	/*概要:退館日の取得及び年月の確認を行う関数
-	引数:string uid:チェック対象のユーザのID
-	戻り値:なし
-	作成日：2017.10.11
-	作成者:K.Asada*/
-	void SetLeaveTimes(std::string uid) {
-		ITOC times;
-		char getdata[BLOCK_COUNT * 16];
-		CheckYears(uid);
-		times.num = GetAdmissionTime();
-		std::ifstream ifs(uid);
-		ifs.get(getdata, BLOCK_COUNT * 16);
-		for (int i = LEAVE_1_INDEX * 16 + 2; i < (LEAVE_4_INDEX + 1) * 16; i++) {
-			if (getdata[i] == ' ') {
-				getdata[i] = times.bytes[1];
-				getdata[i + 1] = times.bytes[0];
-				std::ofstream ofs(uid, std::ios::binary);
-				ofs.write(getdata, 16 * BLOCK_COUNT);
-				ofs.close();
-				break;
+			//ブロック終端まで走査していたら次のブロックへ移行する
+			if (i == 15) {
+				//次のブロックへ移行する
+				index++;
+				//インデックスを最初に戻る
+				i = -1;
 			}
 		}
-		ifs.close();
-		return;
+		return data;
 	}
 
 	/*概要:現在日時分を分に変換して取得する関数
@@ -377,39 +386,20 @@ public:
 	戻り値:なし
 	作成日:2017.10.11
 	作成者:K.Asada*/
-	void CheckYears(std::string uid) {
+	std::vector<std::vector<unsigned char>> CheckYears(std::vector<std::vector<unsigned char>> data) {
 		time_t now = time(NULL);          //現在時刻を取得するため
 		struct tm *pnow = localtime(&now);//現在時刻を取得するための構造体を宣言
 		ITOC years;                       //取得した現在時刻を格納するための変数
-		char filedata[16 * BLOCK_COUNT] = { '\0' };  //ファイルから取得したデータを格納する変数
-		int yearindex = 16 * YEAR_INDEX;             //カードデータの中の年月が格納されている場所
 		//現在年月を取得する
-years.num = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
-//ファイルから年月を取得するためのストリームを開く
-std::ifstream ifs(uid);
-//ファイルからデータを取得する
-ifs.getline(filedata, 16 * BLOCK_COUNT);
-//開いたファイルストリームを閉じる
-ifs.close();
-//データから年月情報を取り出し、取得した年月と比較する
-if (years.bytes[1] != filedata[yearindex] || years.bytes[0] != filedata[yearindex + 1]) {
-	//ファイルから取得した年月を上書きする
-	filedata[yearindex++] = years.bytes[1];
-	//年月を上書きする
-	filedata[yearindex++] = years.bytes[0];
-	//年月の後に格納されている日時分を削除する
-	for (int i = yearindex; i < sizeof(filedata); i++) {
-		//1バイトずつ'\0'に置き換えていく
-		filedata[i] = ' ';
-	}
-	//書き込み用のファイルストリームを開く
-	std::ofstream ofs(uid, std::ios::binary);
-	//上書きしたデータをファイルに書き出す
-	ofs.write(filedata, 16 * BLOCK_COUNT);
-	//書き込み用のファイルストリームを閉じる
-	ofs.close();
-}
-return;
+		years.num = ((pnow->tm_year + 1900) * 12 + pnow->tm_mon + 1);
+		//年月が格納されている場所をチェックして取得した年月日と異なれば書き換える
+		if (data[YEAR_INDEX][0] != years.bytes[0] || data[YEAR_INDEX][1] != years.bytes[1]) {
+			//上位8ビットを書き換える
+			data[YEAR_INDEX][0] = years.bytes[0];
+			//下位8ビットを書き換える
+			data[YEAR_INDEX][1] = years.bytes[1];
+		}
+		return data;
 	}
 
 	/*概要:コマンドの初期化処理関数
@@ -435,7 +425,7 @@ return;
 	戻り値:std::vector<string> times:日時分を文字列に変換した配列
 	作成日:2017.10.16
 	作成者:K.Asada*/
- std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data, int index) {
+ std::vector<std::string> ConvTimes(std::vector<std::vector<unsigned char>> data, int index,int endindex) {
 	try {
 		std::vector<std::string> times;        //日時分を文字列に変換したものを格納するための配列
 		ITOC gettimes;                         //カードデータの中にあるchar型の数値をunsigned int型に変換するための共有体
@@ -444,11 +434,11 @@ return;
 		int min = 0;                           //取得した分を格納する変数
 		int timeindex = index;
 		//カードデータにある日時分情報を走査していく
-		for (int i = 1; data[timeindex][i * 2] != ' ' && data[timeindex][i *2] != '\0'; i++) {
+		for (int i = 1; timeindex < endindex && data[timeindex][i * 2] != '\0'; i++) {
 			//カードデータより日時分の上位8ビットを取得する
-			gettimes.bytes[1] = data[timeindex][i * 2];
+			gettimes.bytes[0] = data[timeindex][i * 2];
 			//カードデータより日時分の下位8ビットを取得する
-			gettimes.bytes[0] = data[timeindex][i * 2 + 1];
+			gettimes.bytes[1] = data[timeindex][i * 2 + 1];
 			//取得した日時分を日に変換する
 			day = gettimes.num / 1440;
 			//取得した日時分を時に変換する
@@ -480,9 +470,9 @@ return;
 			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
 			 bool judge = true;                      //判定結果を格納する
 			 //入館時間を取得する
-			 entertimes = ConvTimes(data, TIMES_1_INDEX);
+			 entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
 			 //退館時間を取得する
-			 leavetimes = ConvTimes(data, LEAVE_1_INDEX);
+			 leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
 			 //入館状態かどうかの判定を行う
 			 if (entertimes.size() > leavetimes.size()){
 				 //入館状態である判定を返す
@@ -501,9 +491,9 @@ return;
 			 std::vector<std::string> leavetimes;    //退館時間を格納する文字列
 			 bool judge = true;                      //判定結果を格納する
 													 //入館時間を取得する
-			 entertimes = ConvTimes(data, TIMES_1_INDEX);
+			 entertimes = ConvTimes(data, TIMES_1_INDEX, LEAVE_1_INDEX);
 			 //退館時間を取得する
-			 leavetimes = ConvTimes(data, LEAVE_1_INDEX);
+			 leavetimes = ConvTimes(data, LEAVE_1_INDEX, END_INDEX);
 			 //入館状態かどうかの判定を行う
 			 if (entertimes.size() <= leavetimes.size()) {
 				 //入館状態である判定を返す

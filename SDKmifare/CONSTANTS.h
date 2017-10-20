@@ -27,7 +27,7 @@ namespace CONSTANTGROUP {
 		//書き込みの始点となるブロック
 		static const int BEGIN_BLOCK = 8;
 		//書き込みの終点となるブロック
-		static const int END_BLOCK = 36;
+		static const int END_BLOCK = 37;
 		//書き込むブロックの数
 		static const int BLOCK_COUNT = END_BLOCK - BEGIN_BLOCK;
 		//ユーザー名が格納されているブロック番号
@@ -82,6 +82,8 @@ namespace CONSTANTGROUP {
 		static const int LEAVE_3_INDEX = 20;
 		//入退館日が格納されているブロック番号
 		static const int LEAVE_4_INDEX = 21;
+		//終端のブロック番号
+		static const int END_INDEX = 22;
 		//属性の1ビット目の名前
 		static const char* ELEM_NAME1 = "一般";
 		//属性の2ビット目の名前

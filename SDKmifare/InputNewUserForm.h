@@ -547,7 +547,7 @@ namespace sdkmifare {
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		char tmp = 0;
-		std::string test2;
+		std::string test2 = "";
 		CONSTANTGROUP::TOC itoc;
 		Int32 index = 0;
 		//ユーザーIDをメンバへ保管する
@@ -560,29 +560,41 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		//ファイル入力クラスをインスタンス化
 		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text, false, System::Text::Encoding::GetEncoding("shift_jis"));
 		//ユーザーIDを8バイト分書き出す
-		this->SetByte(this->textBoxUID->Text, 16, writer);
+		writer->WriteLine(this->CheckByte(this->textBoxUID->Text, 16));
 		//名前(漢字)を16バイト分書き出す
-		this->SetByte(this->textBoxName->Text, 16, writer);
+		writer->WriteLine(this->CheckByte(this->textBoxName->Text, 16));
 		//名前(ふりがな)を16バイト分書き出す
-		this->SetByte(this->textBoxNameKana->Text, 16, writer);
+		writer->WriteLine(this->CheckByte(this->textBoxNameKana->Text, 16));
 		//パスワードを8バイト分書き出す
-		this->SetByte(this->textBoxPASS->Text, 16, writer);
+		writer->WriteLine(this->CheckByte(this->textBoxPASS->Text, 16));
 		//電話番号を16バイト分書き出す
-		this->SetByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16, writer);
+		writer->WriteLine(this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
 		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown2->Value) * 100 + Convert::ToInt32(this->numericUpDown3->Value);
 		test2 = itoc.bytes;
 		//誕生日を4バイト分書き出す
-		this->SetByte(gcnew String(test2.c_str()), 4, writer);
+		writer->Write(this->CheckByte(gcnew String(test2.c_str()), 4));
 		//属性をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1, writer);
+		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1));
 		//権限をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1, writer);
+		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1));
 		//役職をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1, writer);
+		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1));
 		//部署をビットとして書き出す
-		this->SetByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9, writer);
-		//住所を80バイト分書き出す
-		this->SetByte(this->textBoxAdress->Text, 96, writer);
+		writer->WriteLine(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9));
+		//住所が96バイトに収まっているかチェックする
+		this->CheckByte(this->textBoxAdress->Text, 96);
+		//住所の1～16ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 0, 16));
+		//住所の17～32ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 16, 32));
+		//住所の33～48ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,32, 48));
+		//住所の49～64ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,48, 64));
+		//住所の65～80ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,64, 80));
+		//住所の81～96ビットを書き出す
+		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,80, 96));
 		//入力を終了する
 		writer->Close();
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;
@@ -598,11 +610,26 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	}
 }
 
-public:System::Boolean SetByte(String^ data, Int32 setbyte, System::IO::StreamWriter^ writer) {
+public:System::String^ SetByte(String^ data, Int32 beginbyte, Int32 endbyte) {
+	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
+	array<Byte>^ bytes = e->GetBytes(data);     //文字列をバイト配列に変換する
+	char test[16] = { '\0' };
+	System::String^ bytestring = "";                //返却用の文字列
+		//文字列を走査して加工する
+		for (int i = beginbyte; i < endbyte && i < bytes->Length; i++) {
+			//指定のバイト数分空白文字で埋めていく
+			test[i] = bytes[i];
+		}
+	//加工し終えた文字列を返却する
+	return bytestring = gcnew String(test);
+}
+
+public:System::String^ CheckByte(String^ data, Int32 checkbyte) {
 	System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
 	Int32 bytecount = e->GetByteCount(data);    //受け取った文字列をを"shift_jis"としてバイト数をカウントする
+	array<Byte>^ test = e->GetBytes(data);
 	//文字列のバイト数が指定のバイト数を超えていないかのチェック
-	if (bytecount > setbyte) {
+	if (bytecount > checkbyte) {
 		//画面にエラーをひょうじする
 		MessageBox::Show(Constants->OVER_ERROR_MESSAGE);
 		//文字数を超えている旨の例外を投げる
@@ -614,39 +641,9 @@ public:System::Boolean SetByte(String^ data, Int32 setbyte, System::IO::StreamWr
 		//情報未入力の例外を投げる
 		throw gcnew System::Exception(Constants->EMPTY_ERROR_MESSAGE);
 	}
-	//正常なときは文字列の加工に移る
-	else {
-		//文字列を走査して加工する
-		for (; bytecount < setbyte; bytecount++) {
-			//指定のバイト数分空白文字で埋めていく
-			data += " ";
-		}
-		//加工の終えた文字列をファイルに書き込む
-		writer->Write(data);
-	}
 	//加工し終えた文字列を返却する
-	return true;
+	return data;
 }
-
-	   public:System::String^ SetByte(String^ data, Int32 setbyte) {
-		   System::Text::Encoding^ e = System::Text::Encoding::GetEncoding("shift_jis");    //バイト数をカウントするためのクラスをインスタンス化
-		   Int32 bytecount = e->GetByteCount(data);    //受け取った文字列をを"shift_jis"としてバイト数をカウントする
-		   //文字列のバイト数が指定のバイト数を超えていないかのチェック
-		   if (bytecount <= setbyte && data != "") {
-			   //文字列を走査して加工する
-			   for (; bytecount < setbyte; bytecount++) {
-				   //指定のバイト数分空白文字で埋めていく
-				   data += " ";
-			   }
-		   }
-		   //超えているときはエラーを投げる
-		   else {
-			   //文字列に不正があった場合はエラーを返す
-			   throw gcnew System::Exception(Constants->OVER_ERROR_MESSAGE);
-		   }
-		   //加工し終えた文字列を返却する
-		   return data;
-	   }
 
 private: System::Void buttonCancel_Click(System::Object^  sender, System::EventArgs^  e) {
 	//何も行わずにダイアログを閉じる

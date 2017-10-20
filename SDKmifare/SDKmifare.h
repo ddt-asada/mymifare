@@ -237,7 +237,7 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 		//パスワード入力画面に移行する
 		pass->ShowDialog();
 		//受け取ったパスを変換するStringからstringへ
-		this->MarshalString(create->SetByte(pass->textBox1->Text, 16), passtring);
+		this->MarshalString(pass->textBox1->Text, passtring);
 		//メッセージを表示する
 		MessageBox::Show(Constants->SET_CARD_MESSAGE);
 		//カードからデータを取得する関数を呼び出す
@@ -273,7 +273,7 @@ private: System::Void ButtonAdmission(System::Object^  sender, System::EventArgs
 		//パスワード入力画面に移行する
 		pass->ShowDialog();
 		//受け取ったパスを変換するStringからstringへ
-		this->MarshalString(create->SetByte(pass->textBox1->Text, 16), passtring);
+		this->MarshalString(pass->textBox1->Text, passtring);
 		//メッセージを表示する
 		MessageBox::Show(Constants->SET_CARD_MESSAGE);
 		//カードデータを受信する関数を呼び出す
@@ -303,9 +303,9 @@ private: System::Void CreateDisp() {
 		std::string showdata = "";            //カードより取得した文字列を格納する
 		AdmissionSystem* adm = new AdmissionSystem();    //カードよりデータを取得するためのクラスをインスタンス化
 		//カードデータより名前（漢字）を示す文字列を取得する
-		showdata += "名　　　前：" + adm->GetData(*this->carddata, NAME_INDEX) + '\n';
+		showdata += "名前（姓）：" + adm->GetData(*this->carddata, NAME_INDEX) + '\n';
 		//カードデータより名前（フリガナ）を示す文字列を取得する
-		showdata += "ふり 　がな：" + adm->GetData(*this->carddata, KANA_INDEX) + '\n';
+		showdata += "名前（名）：" + adm->GetData(*this->carddata, KANA_INDEX) + '\n';
 		//カードデータより住所を示す文字列を取得する
 		showdata += "住　　　所：" + adm->GetData(*this->carddata, ADRESS_1_INDEX);
 		//カードデータより住所を示す文字列を取得する
