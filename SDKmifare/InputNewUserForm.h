@@ -549,6 +549,7 @@ namespace sdkmifare {
 */
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
+		System::String^ tmp = "";
 		CONSTANTGROUP::TOC itoc;    //int型のビットを変換するための共用体
 		//ユーザーIDをメンバへ保管する
 		this->UID = this->textBoxUID->Text;
@@ -557,44 +558,46 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 			MessageBox::Show(Constants->IDEMPTY_ERROR_MESSAGE);
 			throw gcnew System::Exception(Constants->IDEMPTY_ERROR_MESSAGE);
 		}
-		//ファイル入力クラスをインスタンス化
-		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(this->textBoxUID->Text, false, System::Text::Encoding::GetEncoding("shift_jis"));
 		//ユーザーIDを8バイト分書き出す
-		writer->WriteLine(this->CheckByte(this->textBoxUID->Text, 16));
+		tmp = this->CheckByte(this->textBoxUID->Text, 16) + '\n';
 		//名前(漢字)を16バイト分書き出す
-		writer->WriteLine(this->CheckByte(this->textBoxName->Text, 16));
+		tmp += this->CheckByte(this->textBoxName->Text, 16) + '\n';
 		//名前(ふりがな)を16バイト分書き出す
-		writer->WriteLine(this->CheckByte(this->textBoxNameKana->Text, 16));
+		tmp += this->CheckByte(this->textBoxNameKana->Text, 16) + '\n';
 		//パスワードを8バイト分書き出す
-		writer->WriteLine(this->CheckByte(this->textBoxPASS->Text, 16));
+		tmp += this->CheckByte(this->textBoxPASS->Text, 16) + '\n';
 		//電話番号を16バイト分書き出す
-		writer->WriteLine(this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16));
+		tmp += this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16) + '\n';
 		//生年月日をint型に変換して保持する
 		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown3->Value) * 100 + Convert::ToInt32(this->numericUpDown2->Value);
 		//誕生日を4バイト分書き出す
-		writer->Write(this->CheckByte(gcnew String(itoc.bytes, 0, 4), 4));
+		tmp += this->CheckByte(gcnew String(itoc.bytes, 0, 4), 4);
 		//属性をビットとして書き出す
-		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1));
+		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1);
 		//権限をビットとして書き出す
-		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1));
+		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1);
 		//役職をビットとして書き出す
-		writer->Write(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1));
+		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1);
 		//部署をビットとして書き出す
-		writer->WriteLine(this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9));
+		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9) + '\n';
 		//住所が96バイトに収まっているかチェックする
 		this->CheckByte(this->textBoxAdress->Text, 96);
 		//住所の1～16ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 0, 16));
+		tmp += this->SetByte(this->textBoxAdress->Text, 0, 16) + '\n';
 		//住所の17～32ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text, 16, 32));
+		tmp += this->SetByte(this->textBoxAdress->Text, 16, 32) + '\n';
 		//住所の33～48ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,32, 48));
+		tmp += this->SetByte(this->textBoxAdress->Text,32, 48) + '\n';
 		//住所の49～64ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,48, 64));
+		tmp += this->SetByte(this->textBoxAdress->Text,48, 64) + '\n';
 		//住所の65～80ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,64, 80));
+		tmp += this->SetByte(this->textBoxAdress->Text,64, 80) + '\n';
 		//住所の81～96ビットを書き出す
-		writer->WriteLine(this->SetByte(this->textBoxAdress->Text,80, 96));
+		tmp += this->SetByte(this->textBoxAdress->Text,80, 96) + '\n';
+		//ファイル入力クラスをインスタンス化
+		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter((this->textBoxUID->Text + ".txt"), false, System::Text::Encoding::GetEncoding("shift_jis"));
+		//書き出す
+		writer->Write(tmp);
 		//入力を終了する
 		writer->Close();
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;

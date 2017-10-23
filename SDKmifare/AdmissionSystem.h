@@ -41,7 +41,7 @@ public:
 		//ユーザーIDが格納されたブロックを指定してユーザーIDを取得する
 		uid = GetData(data, UID_INDEX);
 		//取得したユーザー名でファイルを開く
-		std::ifstream ifs(uid);
+		std::ifstream ifs((uid+".txt"));
 		//ユーザーIDをファイル名としたファイルが開けないときはユーザーが存在していないとして例外を投げる
 		if (!ifs.is_open()) {
 			//対象のユーザーが存在していない旨を例外として投げる
@@ -117,7 +117,7 @@ public:
 			//コマンドを初期化する
 			sendcomm = InitCommand(blockindex);
 			//カードへ送信するデータが格納されたファイルを開く
-			std::ifstream ifs(uid);
+			std::ifstream ifs(uid+ ".txt");
 			//コマンドを組み立てていく
 			for (; blockindex < END_BLOCK; blockindex++) {
 				//対象のブロックが4の倍数‐1の時は読み飛ばす
