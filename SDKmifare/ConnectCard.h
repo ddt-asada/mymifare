@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <msclr/gcroot.h>
+#include <vector>
 #include "CONSTANTS.h"
 
 #pragma comment (lib, "winscard.lib")
@@ -43,13 +44,33 @@ public:
 
 	msclr::gcroot<CONSTANTGROUP::ConstantString^> Constants = gcnew CONSTANTGROUP::ConstantString();
 
+	/*概要:ポーリングを開始するための関数
+	引数:SCARDCONTEXT hContext:確保したリソースマネージャのアドレス
+	    :SCARDHANDLE hCard:確保したカードのアドレス
+		:DWORD ActiveProtocol:確保したプロトコル
+	戻り値:なし
+	作成日:2017.10.24
+	作成者:K.Asada*/
+	void BeginPolling(SCARDCONTEXT &hContext, SCARDHANDLE &hCard, DWORD &ActiveProtocol) {
+		//リソースマネージャを確保する
+		Establish(hContext);
+		//ポーリングを開始する
+		Polling(hContext);
+		//カードと接続する
+		CardConnect(hContext, hCard, ActiveProtocol);
+		//ポーリングを終了する
+		return;
+	}
+
 	/*概要：機器との通信を行うためのリソースマネージャを確保するための関数
-	引数：なし
+	引数：SCARDCONTEXT &hContext:リソースマネージャの格納先
 	戻り値：SCARDCONTEXT hContext確保したリソースマネージャ
 	作成日：2017.10.10
-	作成者：K.Asada*/
-	SCARDCONTEXT EstablishContext() {
-		SCARDCONTEXT hContext = 0;        //確保したリソースマネージャのアドレス
+	作成者：K.Asada
+	更新内容:新仕様実装に伴い関数名、引数を変更
+	更新日:2017.10.24
+	更新者:K.Asada*/
+	void Establish(SCARDCONTEXT &hContext) {
 		LONG lResult;                     //リソースマネージャを確保した際の結果を格納するための変数
 		//リソースマネージャを確保し、その結果を取得する
 		lResult = ::SCardEstablishContext(SCARD_SCOPE_USER, NULL, NULL, &hContext);
@@ -67,7 +88,35 @@ public:
 			}
 		}
 		//確保したリソースマネージャのアドレスを返す
-		return hContext;
+		return;
+	}
+
+	/*概要:ポーリングを実行する関数
+	引数:SCARDHANDLE &hContext:カードのアドレス
+	戻り値:なし
+	作成日:2017.10.24
+	作成者:K.Asada*/
+	void Polling(SCARDHANDLE &hContext) {
+		LONG lResult = 0;    //処理の結果を格納する変数
+		SCARD_READERSTATE readerstate;
+		//リーダーのステータスとして"Pasori"を指定する
+		readerstate.szReader = PASORI_NAME;
+		//リーダーの状態を未知にする（どんな変化も拾えるように）
+		readerstate.dwCurrentState = SCARD_STATE_UNAWARE;
+		//リーダーの現在の状態を取得する
+		lResult = SCardGetStatusChange(hContext, 0, &readerstate, 1);
+		//カードがかざされていない場合
+		if (readerstate.dwEventState & SCARD_STATE_EMPTY) {
+			//リーダーの現在の状態をカードなしに設定する
+			readerstate.dwCurrentState = readerstate.dwEventState;
+			//ポーリングを開始し、カードがかざされなければエラー
+			if (SCardGetStatusChange(hContext, INFINITE, &readerstate, 1) != 0) {
+				//カードがかざされていない旨のエラーを投げる
+				throw gcnew System::Exception(Constants->REMOVE_ERROR);
+			}
+		}
+		//正常にカードを読み取れたら戻る
+		return;
 	}
 
 	/*概要：カードへデータ送受信などのコマンドを送信するための関数
@@ -75,8 +124,11 @@ public:
 		：SCARDHANDLE：カードへのハンドル
 		：SENDCOMM SendComm：カードへ送信するコマンド
 	作成日：2017.10.10
-	作成者：K.Asada*/
-	std::vector<std::vector<unsigned char>> Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD ActiveProtocol, std::vector<CONSTANTGROUP::SENDCOMM> SendComm) {
+	作成者：K.Asada
+	更新内容:新仕様実装に伴い引数を変更
+	更新日:2017.10.24
+	更新者:K.Asada*/
+		std::vector<std::vector<unsigned char>> Transmit(SCARDCONTEXT hContext, SCARDHANDLE hCard, DWORD ActiveProtocol, std::vector<CONSTANTGROUP::SENDCOMM> SendComm) {
 		LONG lResult = 0;        //接続結果を格納するための変数
 		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
@@ -122,21 +174,13 @@ public:
 		:SCARDHANDLE hCard:カードへのポインタ
 	戻り値:DWORD ActiveProtocol:開通したプロトコル
 	作成日:2017.10.10
-	作成者:K.Asada*/
-	unsigned long CardConnect(SCARDCONTEXT hContext, SCARDHANDLE &hCard) {
+	作成者:K.Asada
+	更新内容:新仕様実装に伴い引数を変更
+	更新日:2017.10.24
+	更新者:K.Asada*/
+	void CardConnect(SCARDCONTEXT hContext, SCARDHANDLE &hCard, DWORD &ActiveProtocol) {
 		LONG lResult = 0;        //接続結果を格納するための変数
-		SCARD_READERSTATE readerstate;    //リーダの状態を格納するための構造体
-		DWORD ActiveProtocol = 0; //プロトコル
 		DWORD dwAutoAllocate = SCARD_AUTOALLOCATE;    //アロケータ
-		readerstate.szReader = PASORI_NAME;
-		readerstate.dwCurrentState = SCARD_STATE_UNAWARE;
-		lResult = SCardGetStatusChange(hContext, 0, &readerstate, 1);
-		if (readerstate.dwEventState & SCARD_STATE_EMPTY) {
-			readerstate.dwCurrentState = readerstate.dwEventState;
-			if (SCardGetStatusChange(hContext, 10000, &readerstate, 1) != 0) {
-				throw gcnew System::Exception(Constants->REMOVE_ERROR);
-			}
-		}
 		//カードとの接続を開始する
 		lResult = ::SCardConnect(hContext, PASORI_NAME, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &hCard, &ActiveProtocol);
 		//接続結果が失敗なら例外を投げる
@@ -153,7 +197,7 @@ public:
 			EndConnect(hContext, hCard);
 		}
 		//確保したプロトコルを返却する
-		return ActiveProtocol;
+		return;
 	}
 
 	/*概要:カードおよびリーダーとの接続を終了する関数
@@ -170,40 +214,5 @@ public:
 		//リソースマネージャを解放する
 		::SCardReleaseContext(hContext);
 		return;
-	}
-
-	/*概要:リーダーとの接続を終了する関数
-	引数:SCARDCONTEXT hContext:確保していたリソースマネージャ
-	戻り値:なし
-	作成日：2017.10.10
-	作成者：K.Asada*/
-	void EndConnect(SCARDCONTEXT hContext) {
-		//リーダーを解放する
-		::SCardFreeMemory(hContext, PASORI_NAME);
-		//リソースマネージャを解放する
-		::SCardReleaseContext(hContext);
-		return;
-	}
-
-	/*概要:リーダーとの通信の入り口となる関数
-	引数:std::vector<SENDCOMM> sendcomm:リーダーへ送信するコマンド
-	戻り値:std::vector<std::vector<unsigned char>> recvdata:カードから受信したデータ
-	作成日:2017.10.16
-	作成者:K.Asadaa*/
-	std::vector<std::vector<unsigned char>> LinkCard(std::vector<SENDCOMM> sendcomm) {
-		SCARDCONTEXT hContext = 0;        //確保したリソースマネージャのアドレス
-		SCARDHANDLE hCard = 0;            //カードへのアドレス
-		DWORD ActiveProtocol = 0;         //稼働中のプロトコル
-		std::vector<std::vector<unsigned char>> recvdata;    //受信したデータを格納する配列
-		//リソースマネージャの確保を行う
-		hContext = EstablishContext();
-		//カードとの接続、プロトコルの確保を行う
-		ActiveProtocol = CardConnect(hContext, hCard);
-		//カードへコマンドの送信を行う
-		recvdata = Transmit(hContext, hCard, ActiveProtocol, sendcomm);
-		//全ての接続を終了する
-		EndConnect(hContext, hCard);
-		//カードから取得したデータを返却する
-		return recvdata;
 	}
 };

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SDKmifare.h"
+#include "AcceptanceForm.h"
 
 using namespace sdkmifare;
 [STAThreadAttribute]
 int main() {
-	Application::Run(gcnew SDKmifare());
+	Application::Run(gcnew AcceptanceForm());
 	return 0;
 }

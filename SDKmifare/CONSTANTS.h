@@ -16,14 +16,15 @@ namespace CONSTANTGROUP {
 
 	union ITOC {
 		unsigned short int num;
-		char bytes[sizeof(unsigned short int)];
+		unsigned char bytes[sizeof(unsigned short int)];
 	};
 
-	union TOC {
+	union UITOC {
 		unsigned int num;
 		char bytes[sizeof(unsigned int)];
 	};
-
+	//次ごとの日付が格納された配列
+	static const int yearmonth[12] = { 31,27,31,30,31,30,31,31,30,31,30,31 };
 	//書き込みの始点となるブロック
 	static const int BEGIN_BLOCK = 8;
 	//書き込みの終点となるブロック
@@ -158,7 +159,18 @@ namespace CONSTANTGROUP {
 		ConstantString() {
 
 		}
-
+		//退館を行うかの確認メッセージ
+		static System::String^ LEAVE_CHECK = "退館しますか？";
+		//退館処理が中断されたことを示すメッセージ
+		static System::String^ LEAVE_CANCEL = "退館処理を中断しました。";
+		//入館を行うかの確認メッセージ
+		static System::String^ ENTER_CHECK = "入館しますか？";
+		//入館処理が中断されたことを示すメッセージ
+		static System::String^ ENTER_CANCEL = "入館処理を中断しました。";
+		//前回の入館処理から1日以上経過しているときに表示するメッセージ
+		static System::String^ ENTER_DAY = "前回の入館処理から1日以上経過しています。";
+		//前回の退館処理以降に入館処理を行っていないときに表示するメッセージ
+		static System::String^ NOT_ENTER = "前回の退館処理から入館処理を一度も行っていません。";
 		//新規作成時に表示されるメッセージ
 		static System::String^ NEW_MESSAGE = "新規で作成します。\n情報を入力してください。";
 		//カードをかざす指示のメッセージ

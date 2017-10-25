@@ -550,7 +550,7 @@ namespace sdkmifare {
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		System::String^ tmp = "";
-		CONSTANTGROUP::TOC itoc;    //int型のビットを変換するための共用体
+		CONSTANTGROUP::UITOC itoc;    //int型のビットを変換するための共用体
 		//ユーザーIDをメンバへ保管する
 		this->UID = this->textBoxUID->Text;
 		//ユーザIDが空の場合はファイルが生成できないのでその時点で処理を終了する
