@@ -559,41 +559,30 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 			throw gcnew System::Exception(Constants->IDEMPTY_ERROR_MESSAGE);
 		}
 		//ユーザーIDを8バイト分書き出す
-		tmp = this->CheckByte(this->textBoxUID->Text, 16) + '\n';
+		tmp += "{\"" + Constants->CLI_UID_LABEL + "\":\"" + this->CheckByte(this->textBoxUID->Text, 16) + "\",";
 		//名前(漢字)を16バイト分書き出す
-		tmp += this->CheckByte(this->textBoxName->Text, 16) + '\n';
+		tmp += "\"" +Constants->CLI_FIRST_NAME + "\":\"" + this->CheckByte(this->textBoxName->Text, 16) + "\",";
 		//名前(ふりがな)を16バイト分書き出す
-		tmp += this->CheckByte(this->textBoxNameKana->Text, 16) + '\n';
+		tmp += "\"" + Constants->CLI_LAST_NAME + "\":\"" + this->CheckByte(this->textBoxNameKana->Text, 16) + "\",";
 		//パスワードを8バイト分書き出す
-		tmp += this->CheckByte(this->textBoxPASS->Text, 16) + '\n';
+		tmp += "\"" + Constants->CLI_PASS_LABEL + "\":\"" + this->CheckByte(this->textBoxPASS->Text, 16) + "\",";
 		//電話番号を16バイト分書き出す
-		tmp += this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16) + '\n';
+		tmp += "\"" + Constants->CLI_TELL_LABEL + "\":\"" + this->CheckByte(this->textBoxTELL1->Text + this->textBoxTELL2->Text + this->textBoxTELL3->Text, 16) + "\",";
 		//生年月日をint型に変換して保持する
-		itoc.num = Convert::ToInt32(this->numericUpDown1->Value) * 10000 + Convert::ToInt32(this->numericUpDown3->Value) * 100 + Convert::ToInt32(this->numericUpDown2->Value);
-		//誕生日を4バイト分書き出す
-		tmp += this->CheckByte(gcnew String(itoc.bytes, 0, 4), 4);
+		tmp += "\"" + Constants->CLI_IRTH_LABEL + "\":\"" + Convert::ToString(this->numericUpDown1->Value) + "年" + Convert::ToString(this->numericUpDown3->Value) + "月" + Convert::ToString(this->numericUpDown2->Value) + "日" + "\",";
 		//属性をビットとして書き出す
-		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxElement->SelectedIndex) >> 1)), 1);
+		tmp += "\"" + Constants->CLI_ELEM_LABEL + "\":\"" + this->comboBoxElement->SelectedItem->ToString() + "\",";
 		//権限をビットとして書き出す
-		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxAdmin->SelectedIndex) >> 1)), 1);
+		tmp += "\"" + Constants->CLI_ADM_LABEL + "\":\"" + this->comboBoxAdmin->SelectedItem->ToString() + "\",";
 		//役職をビットとして書き出す
-		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxPosition->SelectedIndex) >> 1)), 1);
+		tmp += "\"" + Constants->CLI_OCCUP_LABEL + "\":\"" + this->comboBoxPosition->SelectedItem->ToString() + "\",";
 		//部署をビットとして書き出す
-		tmp += this->CheckByte(Convert::ToString(Convert::ToChar((1 << this->comboBoxDepart->SelectedIndex) | (1 << (this->comboBoxOccupations->SelectedIndex + 4)))), 9) + '\n';
+		tmp += "\"" + Constants->CLI_DEPART_LABEL + "\":\"" + this->comboBoxDepart->SelectedItem->ToString() + "\",";
+		tmp += "\"" + Constants->CLI_GROUP_LABEL + "\":\"" + this->comboBoxOccupations->SelectedItem->ToString() + "\",";
 		//住所が96バイトに収まっているかチェックする
 		this->CheckByte(this->textBoxAdress->Text, 96);
-		//住所の1～16ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text, 0, 16) + '\n';
-		//住所の17～32ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text, 16, 32) + '\n';
-		//住所の33～48ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text,32, 48) + '\n';
-		//住所の49～64ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text,48, 64) + '\n';
-		//住所の65～80ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text,64, 80) + '\n';
-		//住所の81～96ビットを書き出す
-		tmp += this->SetByte(this->textBoxAdress->Text,80, 96) + '\n';
+		tmp += "\"" + Constants->CLI_ADDRESS_LABEL + "\":\"" + this->textBoxAdress->Text +"\",";
+		tmp += "\"" + Constants->CLI_YEAR_LABEL + "\":\"\"," + "\"" + Constants->CLI_ENTER_LABEL + "\":\"\"," + "\"" + Constants->CLI_LEAVE_LABEL + "\":\"\"}";
 		//ファイル入力クラスをインスタンス化
 		System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter((this->textBoxUID->Text + ".txt"), false, System::Text::Encoding::GetEncoding("shift_jis"));
 		//書き出す
@@ -603,7 +592,7 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;
 		//ダイアログを閉じる
 		this->Close();
-		return;
+		//return;
 	}
 	catch (System::Exception^ e) {
 		//エラーが発生した旨を表示する

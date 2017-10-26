@@ -193,9 +193,9 @@ namespace sdkmifare {
 			int year = 0;             //取得した年
 			int month = 0;            //取得した月
 									  //カードデータより年月の上位8ビットを取得する
-			getyears.bytes[0] = data[YEAR_INDEX][0];
+	//		getyears.bytes[0] = data[YEAR_INDEX][0];
 			//カードデータより年月の下位8ビットを取得する
-			getyears.bytes[1] = data[YEAR_INDEX][1];
+		//	getyears.bytes[1] = data[YEAR_INDEX][1];
 			//年月を年に変換する
 			year = getyears.num / 12;
 			//年月を月に変換する

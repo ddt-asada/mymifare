@@ -23,8 +23,6 @@ namespace CONSTANTGROUP {
 		unsigned int num;
 		char bytes[sizeof(unsigned int)];
 	};
-	//次ごとの日付が格納された配列
-	static const int yearmonth[12] = { 31,27,31,30,31,30,31,31,30,31,30,31 };
 	//書き込みの始点となるブロック
 	static const int BEGIN_BLOCK = 8;
 	//書き込みの終点となるブロック
@@ -66,7 +64,9 @@ namespace CONSTANTGROUP {
 	//誕生日が格納されているブロック番号
 	static const int BIRTH_INDEX = 5;
 	//年月が格納されているブロック番号
-	static const int YEAR_INDEX = 12;
+	static const int YEAR_1_INDEX = 12;
+	//年月が格納されているブロック番号
+	static const int YEAR_2_INDEX = 18;
 	//入退館日が格納されているブロック番号
 	static 	const int TIMES_1_INDEX = 12;
 	//入退館日が格納されているブロック番号
@@ -85,6 +85,8 @@ namespace CONSTANTGROUP {
 	static const int LEAVE_4_INDEX = 21;
 	//終端のブロック番号
 	static const int END_INDEX = 22;
+	//ブロックに対応した番号が格納された配列
+	static const int writeblock[END_INDEX] = { 0x08,0x09,0x0A,0x0C,0x0D,0x0E,0x10,0x11,0x12,0x14,0x15,0x16,0x18,0x19,0x1A,0x1C,0x1D,0x1E,0x20,0x21,0x22,0x23 };
 	//属性の1ビット目の名前
 	static const char* ELEM_NAME1 = "一般";
 	//属性の2ビット目の名前
@@ -121,10 +123,14 @@ namespace CONSTANTGROUP {
 	static const char* POS_NAME3 = "部長";
 	//役職の4ビット目の名前
 	static const char* POS_NAME4 = "";
+	//ユーザーIDのラベルの名前
+	static const char* UID_LABEL = "ID：";
 	//名前（姓）のラベルの名前
 	static const char* FIRST_NAME = "名前（姓）：";
 	//名前（名）のラベルの名前
 	static const char* LAST_NAME = "名前（名）：";
+	//PASSのラベルの名前
+	static const char* PASS_LABEL = "PASS：";
 	//住所のラベルの名前
 	static const char* ADDRESS_LABEL = "住　　　所：";
 	//電話番号のラベルの名前
@@ -141,6 +147,12 @@ namespace CONSTANTGROUP {
 	static const char* GROUP_LABEL = "グ ル ー プ：";
 	//所属のラベルの名前
 	static const char* DEPART_LABEL = "所　　　属：";
+	//年月日のラベルの名前
+	static const char* YEAR_LABEL = "年月日：";
+	//入館日のラベルの名前
+	static const char* ENTER_LABEL = "入館日：";
+	//退館日のラベルの名前
+	static const char* LEAVE_LABEL = "退館日：";
 	static const SENDCOMM LOADKEY = { 11,{ 0xFF,0x82,0x00,0x00,0x06,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF } };
 	//セクター認証コマンド、各セクターにアクセスする前に行わなければならない(詳細はリファレンス参照)
 	// General Authenticate
@@ -241,5 +253,35 @@ namespace CONSTANTGROUP {
 		static System::String^ CLI_POS_NAME3 = gcnew System::String(POS_NAME3);
 		//役職の4ビット目の名前
 		static System::String^ CLI_POS_NAME4 = gcnew System::String(POS_NAME4);
+		//ユーザーIDのラベルの名前
+		static System::String^ CLI_UID_LABEL = "ID：";
+		//名前（姓）のラベルの名前
+		static System::String^ CLI_FIRST_NAME = "名前（姓）：";
+		//名前（名）のラベルの名前
+		static System::String^ CLI_LAST_NAME = "名前（名）：";
+		//PASSのラベルの名前
+		static System::String^ CLI_PASS_LABEL = "PASS：";
+		//住所のラベルの名前
+		static System::String^ CLI_ADDRESS_LABEL = "住　　　所：";
+		//電話番号のラベルの名前
+		static System::String^ CLI_TELL_LABEL = "電話番号：";
+		//誕生日のラベルの名前
+		static System::String^ CLI_IRTH_LABEL = "誕 生  日：";
+		//属性のラベルの名前
+		static System::String^ CLI_ELEM_LABEL = "属　　　性：";
+		//権限のラベルの名前
+		static System::String^ CLI_ADM_LABEL = "権　　　限：";
+		//役職のラベルの名前
+		static System::String^ CLI_OCCUP_LABEL = "役　　　職：";
+		//グループのラベルの名前
+		static System::String^ CLI_GROUP_LABEL = "グ ル ー プ：";
+		//所属のラベルの名前
+		static System::String^ CLI_DEPART_LABEL = "所　　　属：";
+		//年月日のラベルの名前
+		static System::String^ CLI_YEAR_LABEL = "年月日：";
+		//入館日のラベルの名前
+		static System::String^ CLI_ENTER_LABEL = "入館日：";
+		//退館日のラベルの名前
+		static System::String^ CLI_LEAVE_LABEL = "退館日：";
 	};
 }

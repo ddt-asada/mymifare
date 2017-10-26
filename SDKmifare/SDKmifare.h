@@ -253,7 +253,7 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 			}
 		}
 		//退館時刻をカードに記録する関数を呼び出す
-		adm->UpdateCardData(*this->carddata, this->hContext, this->hCard, this->ActiveProtocol, LEAVE_1_INDEX, END_INDEX);
+//		adm->UpdateCardData(*this->carddata, this->hContext, this->hCard, this->ActiveProtocol, LEAVE_1_INDEX, END_INDEX);
 		//退館完了のメッセージを表示する
 		MessageBox::Show(Constants->LEAVE_MESSAGE);
 		return;
@@ -287,12 +287,6 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 			 return gcnew String(check.c_str());
 		 }
 
-		 /*概要:カードユーザーの入退館状態を判定し、現在の状態を示す文字列を返却する関数
-		 引数:std::vector<std::vector<unsigned char>>:カードより取得したデータ
-		 戻り値:System::String^:入退館状態を示す文字列
-		 作成日:2017.10.24
-		 作成者:K.Asada*/
-
 /*概要:取得したデータをもとに画面に表示するラベルを作成する関数
 作成日:2017.10.10
 作成者:K.Asada
@@ -303,34 +297,28 @@ private: System::Void ButtonLeavingClick(System::Object^  sender, System::EventA
 更新者:K.Asada*/
 private: System::String^ GetUserInfo(std::vector<std::vector<unsigned char>> data) {
 	try {
-		std::string userinfo = "";            //カードより取得した文字列を格納する
+		std::string userinfo = "";            //ファイルのユーザーデータ格納するための文字列
+		picojson::object obj;                 //ファイルからJSONを取得して扱うためのオブジェクト
 		AdmissionSystem* adm = new AdmissionSystem();    //カードよりデータを取得するためのクラスをインスタンス化
-		//カードデータより名前（漢字）を示す文字列を取得する
-		userinfo += FIRST_NAME + adm->GetData(*this->carddata, NAME_INDEX) + '\n';
+		obj = adm->GetPicoObj(*this->uid);
+		//JSONより名前（漢字）を示す文字列を取得する
+		userinfo += FIRST_NAME + obj[FIRST_NAME].get<std::string>() + '\n';
 		//カードデータより名前（フリガナ）を示す文字列を取得する
-		userinfo += LAST_NAME + adm->GetData(*this->carddata, KANA_INDEX) + '\n';
+		userinfo += LAST_NAME + obj[LAST_NAME].get<std::string>() + '\n';
 		//カードデータより住所を示す文字列を取得する
-		userinfo += ADDRESS_LABEL + adm->GetData(*this->carddata, ADRESS_1_INDEX);
-		//カードデータより住所を示す文字列を取得する
-		userinfo += adm->GetData(*this->carddata, ADRESS_2_INDEX);
-		//カードデータより住所を示す文字列を取得する
-		userinfo += adm->GetData(*this->carddata, ADRESS_3_INDEX);
-		//カードデータより住所を示す文字列を取得する
-		userinfo += adm->GetData(*this->carddata, ADRESS_4_INDEX);
-		//カードデータより住所を示す文字列を取得する
-		userinfo += adm->GetData(*this->carddata, ADRESS_5_INDEX) + '\n';
+		userinfo += ADDRESS_LABEL + obj[ADDRESS_LABEL].get<std::string>() + '\n';
 		//カードデータより電話番号を示す文字列を取得する
-		userinfo += TELL_LABEL + adm->GetData(*this->carddata, TELL_INDEX) + '\n';
+		userinfo += TELL_LABEL + obj[TELL_LABEL].get<std::string>() + '\n';
 		//カードデータより誕生日を示す文字列を取得する
-		userinfo += BIRTH_LABEL + this->ConvBirth(data[BIRTH_INDEX]) + '\n';
+		userinfo += BIRTH_LABEL + obj[BIRTH_LABEL].get<std::string>() + '\n';
 		//属性を取得する
-		userinfo += + ELEM_LABEL + adm->GetElem(data[ELEM_INDEX][4], ELEM_NAME1, ELEM_NAME2, ELEM_NAME3, ELEM_NAME4) + '\n';
+		userinfo += ELEM_LABEL + obj[ELEM_LABEL].get<std::string>() + '\n';
 		//カードデータより権限を示す文字列を取得する
-		userinfo += ADM_LABEL + adm->GetElem(data[ADM_INDEX][5], ADM_NAME1, ADM_NAME2, "", "") + '\n';
+		userinfo += ADM_LABEL + obj[ADM_LABEL].get<std::string>() + '\n';
 		//カードデータより役職を示す文字列を取得する
-		userinfo += OCCUP_LABEL + adm->GetElem(data[POS_INDEX][6], POS_NAME1, POS_NAME2, POS_NAME3, POS_NAME4) + '\n';
-		userinfo += GROUP_LABEL + adm->GetElem(data[DEPART_INDEX][7] >> 4, "", OCCUP_NAME1, OCCUP_NAME2, OCCUP_NAME3) + '\n';
-		userinfo += DEPART_LABEL + adm->GetElem(data[DEPART_INDEX][7], "", DEPART_NAME1, DEPART_NAME2, DEPART_NAME3) + '\n';
+		userinfo += OCCUP_LABEL + obj[OCCUP_LABEL].get<std::string>() + '\n';
+		userinfo += GROUP_LABEL + obj[GROUP_LABEL].get<std::string>() + '\n';
+		userinfo += DEPART_LABEL + obj[DEPART_LABEL].get<std::string>() + '\n';
 		return gcnew String(userinfo.c_str());
 	}
 	catch (System::Exception^ e) {
@@ -355,34 +343,6 @@ private: System::String^ GetUserInfo(std::vector<std::vector<unsigned char>> dat
 			 return;
 		 }
 
-		 /*概要:カードデータより誕生日を取得するための関数
-		 引数:vector<char> data:カードデータ
-		 戻り値:std::string birth:誕生日を取得して文字列に変換したデータ
-		 作成日:2017.10.19
-		 作成者:K.Asada*/
-		 std::string ConvBirth(std::vector<unsigned char> data) {
-			 UITOC condata;    //char型をint型に変換する際に使用するバイト配列
-			 int year = 0;                               //誕生年
-			 int month = 0;                              //誕生月
-			 int day = 0;                                //誕生日
-			 std::string birth;                          //誕生年月日を示す文字列
-			 //カードデータより誕生日を取得する
-			 for (int i = 0; i < 4; i++) {
-				 //1バイトずつ取得していく
-				 condata.bytes[i] = data[i];
-			 }
-			 //誕生年を取得する
-			 year = condata.num / 10000;
-			 //誕生月を取得する
-			 month = condata.num / 100 - year * 100;
-			 //誕生日を取得する
-			 day = condata.num - year * 10000 - month * 100;
-			 //誕生年月日の文字列として組み立てる
-			 birth = std::to_string(year) + "年" + std::to_string(month) + "月" + std::to_string(day) + "日";
-			 //取得した文字列を返却する
-			 return birth;
-		 }
-
 
 		 /*概要:入退館画面ロード時のイベント
 		 作成日:2017.10.24
@@ -393,12 +353,12 @@ private: System::Void SDKmifareFormLoad(System::Object^  sender, System::EventAr
 		//かざされたカードからカードデータを取得する
 		*this->carddata = adm->GetCardData(this->hContext, this->hCard, this->ActiveProtocol);
 		//カードのユーザーがシステムに登録されているかをチェックする
-		*this->uid = adm->CheckUser(*this->carddata);
+		*this->uid = adm->CheckUser(*this->carddata) +".txt";
 		//カード内のデータとシステムに登録されているデータが一致するかをチェックする
-		if (!adm->CollationFiledata(*this->carddata, *this->uid)) {
+/*		if (!adm->CollationFiledata(*this->carddata, *this->uid)) {
 			//一致していなければエラーを投げる
 			throw gcnew System::Exception("カードデータが不正です。");
-		}
+		}*/
 		//ユーザー情報をカードデータより取得する
 		this->labelInformation->Text = this->GetUserInfo(*this->carddata);
 		//ユーザーの危険度をチェックして対応した文字列を取得する
@@ -433,7 +393,7 @@ private: System::Void ButtonEnteringClick(System::Object^  sender, System::Event
 			}
 		}
 		//入館したうえで、入館時間を更新する関数を呼び出す
-		adm->UpdateCardData(*this->carddata, this->hContext, this->hCard, this->ActiveProtocol, TIMES_1_INDEX, END_INDEX);
+		adm->UpdateCardData(*this->carddata, this->hContext, this->hCard, this->ActiveProtocol, TIMES_1_INDEX);
 		//入館官僚のメッセージを表示する
 		MessageBox::Show(Constants->ENTER_MESSAGE);
 		return;

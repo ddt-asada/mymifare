@@ -27,6 +27,9 @@
     <ClCompile Include="TimeCardForm.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="AcceptanceForm.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDKmifare.h">
@@ -50,6 +53,12 @@
     <ClInclude Include="TimeCardForm.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="AcceptanceForm.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="picojson.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SDKmifare.resx">
@@ -59,6 +68,12 @@
       <Filter>リソース ファイル</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="InputNewUserForm.resx">
+      <Filter>リソース ファイル</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TimeCardForm.resx">
+      <Filter>リソース ファイル</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AcceptanceForm.resx">
       <Filter>リソース ファイル</Filter>
     </EmbeddedResource>
   </ItemGroup>

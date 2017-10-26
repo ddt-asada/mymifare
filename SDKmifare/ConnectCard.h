@@ -138,6 +138,11 @@ public:
 		int blockindex = -1;
 		//全てのコマンドを送信するまで繰り返す
 		for (int i = 0; SendComm[i].sendLength > -1; i++) {
+			//セキュリティブロックにアクセスしようとしていたらエラーを投げる
+			if (SendComm[i].sendCommand[3] % 4 == 3) {
+				//エラーを投げる
+				throw gcnew System::Exception("書き換え付加です。");
+			}
 			//受信の最大サイズを取得する
 			ResponseSize = sizeof(RecvBuf);
 			//コマンドを送信して、結果とレスポンスへのポインタを取得する

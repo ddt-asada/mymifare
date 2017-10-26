@@ -26,12 +26,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AcceptanceForm.cpp" />
     <ClCompile Include="InputNewUserForm.cpp" />
     <ClCompile Include="PassForm.cpp" />
     <ClCompile Include="SDKmifare.cpp" />
     <ClCompile Include="TimeCardForm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AcceptanceForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="AdmissionSystem.h" />
     <ClInclude Include="ConnectCard.h" />
     <ClInclude Include="CONSTANTS.h" />
@@ -41,6 +45,7 @@
     <ClInclude Include="PassForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="picojson.h" />
     <ClInclude Include="SDKmifare.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -49,6 +54,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AcceptanceForm.resx">
+      <DependentUpon>AcceptanceForm.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InputNewUserForm.resx">
       <DependentUpon>InputNewUserForm.h</DependentUpon>
     </EmbeddedResource>
@@ -144,6 +152,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\asdkzs\Downloads\picojson-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>C:\Users\asdkzs\Downloads\picojson-master;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />

@@ -2,6 +2,8 @@
 
 #include "ConnectCard.h"
 #include "SDKmifare.h"
+#include "InputNewUserForm.h"
+#include "AdmissionSystem.h"
 
 namespace sdkmifare {
 
@@ -37,6 +39,8 @@ namespace sdkmifare {
 				delete components;
 			}
 		}
+	private: System::Windows::Forms::Button^  button1;
+	protected:
 
 	private:
 		/// <summary>
@@ -51,13 +55,25 @@ namespace sdkmifare {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
+			// 
+			// button1
+			// 
+			this->button1->Location = System::Drawing::Point(764, 418);
+			this->button1->Name = L"button1";
+			this->button1->Size = System::Drawing::Size(236, 117);
+			this->button1->TabIndex = 0;
+			this->button1->Text = L"テスト用";
+			this->button1->UseVisualStyleBackColor = true;
+			this->button1->Click += gcnew System::EventHandler(this, &AcceptanceForm::button1_Click);
 			// 
 			// AcceptanceForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1128, 580);
+			this->Controls->Add(this->button1);
 			this->Name = L"AcceptanceForm";
 			this->Text = L"AcceptanceForm";
 			this->Load += gcnew System::EventHandler(this, &AcceptanceForm::AcceptanceForm_Load);
@@ -99,5 +115,11 @@ namespace sdkmifare {
 					 con->EndConnect(hContext, hCard);
 				 }
 			 }
+	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+		InputNewUserForm^ user = gcnew InputNewUserForm();
+		AdmissionSystem* adm = new AdmissionSystem();
+		user->ShowDialog();
+		//adm->UpdateFileDate("asada.txt");
+	}
 	};
 }
